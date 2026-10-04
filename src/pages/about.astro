@@ -1,0 +1,775 @@
+---
+import Breadcrumbs from '@/components/breadcrumbs.astro'
+import Link from '@/components/link.astro'
+import PageHead from '@/components/page-head.astro'
+import type { ProfileLink } from '@/types'
+import { PROFILE } from '@/consts'
+import Layout from '@/layouts/layout.astro'
+
+const heroFacts = [
+  { label: 'Base', value: 'Singapore' },
+  { label: 'Current track', value: 'NUS CS' },
+  { label: 'Best fit', value: 'Adoption / tooling / ops' },
+]
+const heroMetrics = PROFILE.metrics
+const heroLinks = ['LinkedIn', 'Email', 'GitHub']
+  .flatMap((label): ProfileLink[] => {
+    const match = PROFILE.links.find((item) => item.label === label)
+    return match ? [match] : []
+  })
+---
+
+<Layout variant="immersive">
+  <PageHead slot="head" title="About" description={PROFILE.summary} />
+
+  <section
+    class="relative overflow-hidden border-b border-white/10 bg-black/30"
+  >
+    <div
+      class="landing-dot-mass absolute top-0 right-[-6rem] h-[20rem] w-[20rem] opacity-[0.22] sm:right-[-4rem] sm:h-[28rem] sm:w-[28rem] lg:h-[34rem] lg:w-[34rem]"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.06] via-transparent to-transparent"
+    >
+    </div>
+    <div
+      class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-20"
+    >
+      <Breadcrumbs
+        variant="immersive"
+        items={[{ label: 'About', icon: 'lucide:info' }]}
+      />
+
+      <div class="about-hero mt-6 xl:mt-8">
+        <div
+          class="about-hero__main immersive-animate-in"
+          transition:name="page-intro"
+        >
+          <p class="landing-section-label">About</p>
+          <h1 class="about-hero__title">
+            Product engineer for onboarding, internal tooling, and operational
+            systems.
+          </h1>
+
+          <p class="about-hero__summary">
+            I help technical teams make complex products easier to adopt,
+            operate, and trust.
+          </p>
+
+          <div class="about-hero__impact">
+            <p class="about-hero__impact-label">Impact snapshot</p>
+            <div class="about-hero__metrics">
+              {
+                heroMetrics.map((metric) => (
+                  <article class="about-hero__metric">
+                    <p class="about-hero__metric-value">{metric.value}</p>
+                    <p class="about-hero__metric-label">{metric.label}</p>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <aside class="about-hero__rail immersive-animate-in">
+          <div class="about-hero__rail-block">
+            <p class="about-hero__rail-label">Connect</p>
+            <div class="about-hero__links">
+              {
+                heroLinks.map((item, index) => (
+                  <Link
+                    href={item.href}
+                    external
+                    class:list={[
+                      'about-hero__link',
+                      index >= 2 && 'hidden sm:flex',
+                    ]}
+                  >
+                    <span class="about-hero__link-label">{item.label}</span>
+                    <span class="about-hero__link-note">{item.note}</span>
+                  </Link>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="about-hero__rail-block">
+            <p class="about-hero__rail-label">At a glance</p>
+            <div class="about-hero__meta">
+              {
+                heroFacts.map((fact) => (
+                  <div class="about-hero__meta-card">
+                    <p class="about-hero__meta-label">{fact.label}</p>
+                    <p class="about-hero__meta-value">{fact.value}</p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          <p class="about-hero__rail-note">
+            Recruiter-friendly proof from MetaLearner, Singapore Armed Forces,
+            GovTech, and client delivery work.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-white/10 bg-black/20">
+    <div
+      class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+    >
+      <div class="max-w-3xl border-b border-white/10 pb-8">
+        <p class="landing-section-label">Experience</p>
+        <h2 class="landing-section-title mt-4 max-w-3xl">
+          Role-by-role proof from product, platform, client delivery, and cyber
+          operations.
+        </h2>
+        <p class="immersive-copy mt-6 max-w-2xl text-base leading-7">
+          This is the full experience read: what changed, what shipped, and
+          where the strongest outcomes came from.
+        </p>
+      </div>
+
+      <div class="mt-6 space-y-4 sm:mt-8 sm:space-y-6">
+        {
+          PROFILE.experience.map((experience) => (
+            <article id={experience.id} class="about-case-study scroll-mt-28">
+              <div class="about-case-study__header">
+                <div>
+                  <p class="about-case-study__eyebrow">{experience.period}</p>
+                  <h3 class="about-case-study__title">{experience.company}</h3>
+                </div>
+                <p class="about-case-study__role">{experience.role}</p>
+              </div>
+
+              <div class="mt-5 grid gap-5 sm:mt-6 sm:gap-8 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)]">
+                <p class="text-base leading-8 text-white/62 sm:text-lg">
+                  {experience.caseStudyContext}
+                </p>
+                <div class="space-y-4">
+                  {experience.highlights.map((highlight) => (
+                    <div class="about-case-study__bullet">{highlight}</div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-wrap gap-2 sm:mt-6">
+                {experience.tags.map((tag) => (
+                  <span class="about-chip">{tag}</span>
+                ))}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-white/10">
+    <div
+      class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+    >
+      <div class="max-w-3xl border-b border-white/10 pb-8">
+        <p class="landing-section-label">Impact work</p>
+        <h2 class="landing-section-title mt-4 max-w-2xl">
+          Resumify applied the same product instinct to inclusive hiring.
+        </h2>
+        <p class="immersive-copy mt-6 max-w-2xl text-base leading-7">
+          Outside internships and formal roles, this is the clearest example of
+          building with both product judgment and social purpose: simplifying
+          resume creation, job matching, and employment access for people who
+          are often excluded from standard hiring flows.
+        </p>
+      </div>
+
+      <div class="mt-6 space-y-4 sm:mt-8 sm:space-y-6">
+        {
+          PROFILE.initiatives.map((initiative) => (
+            <article class="about-case-study">
+              <div class="about-case-study__header">
+                <div>
+                  <p class="about-case-study__eyebrow">{initiative.period}</p>
+                  <h3 class="about-case-study__title">{initiative.name}</h3>
+                </div>
+                <p class="about-case-study__role">{initiative.role}</p>
+              </div>
+
+              <div class="mt-5 grid gap-5 sm:mt-6 sm:gap-8 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)]">
+                <p class="text-base leading-8 text-white/62 sm:text-lg">
+                  {initiative.summary}
+                </p>
+                <div class="space-y-4">
+                  {initiative.highlights.map((highlight) => (
+                    <div class="about-case-study__bullet">{highlight}</div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-wrap gap-2 sm:mt-6">
+                {initiative.tags.map((tag) => (
+                  <span class="about-chip">{tag}</span>
+                ))}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div
+      class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+    >
+      <div class="grid gap-4 sm:gap-6 xl:grid-cols-2">
+        <section class="about-compact-panel immersive-panel p-5 sm:p-8">
+          <p class="landing-section-label">Education</p>
+          <div class="mt-5 space-y-5 sm:mt-6 sm:space-y-6">
+            {
+              PROFILE.education.map((entry) => (
+                <article class="about-block">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-2xl leading-none font-medium tracking-[-0.04em] text-white">
+                      {entry.institution}
+                    </h2>
+                    <p class="about-block__meta">{entry.period}</p>
+                  </div>
+                  <p class="mt-3 text-base leading-7 text-white/68">
+                    {entry.degree}
+                  </p>
+                  <div class="mt-4 space-y-3">
+                    {entry.details.map((detail) => (
+                      <div class="about-line-item">{detail}</div>
+                    ))}
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="about-compact-panel immersive-panel p-5 sm:p-8">
+          <p class="landing-section-label">Awards</p>
+          <div class="mt-5 space-y-2 sm:mt-6 sm:space-y-3">
+            {
+              PROFILE.awards.map((award) => (
+                <div class="about-line-item">{award}</div>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="about-compact-panel immersive-panel p-5 sm:p-8">
+          <p class="landing-section-label">Hackathons</p>
+          <div
+            class="about-stats-grid mt-5 grid grid-cols-3 gap-px border border-white/10 bg-white/[0.02] sm:mt-6"
+          >
+            {
+              PROFILE.hackathonStats.map((stat) => (
+                <div class="about-mini-stat">
+                  <p class="about-mini-stat__value">{stat.value}</p>
+                  <p class="about-mini-stat__label">{stat.label}</p>
+                </div>
+              ))
+            }
+          </div>
+          <div class="mt-5 space-y-2 sm:mt-6 sm:space-y-3">
+            {
+              PROFILE.hackathonWins.map((win) => (
+                <div class="about-line-item">{win}</div>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="about-compact-panel immersive-panel p-5 sm:p-8">
+          <p class="landing-section-label">Leadership</p>
+          <div class="mt-5 space-y-5 sm:mt-6 sm:space-y-6">
+            {
+              PROFILE.leadership.map((entry) => (
+                <article class="about-block">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-2xl leading-none font-medium tracking-[-0.04em] text-white">
+                      {entry.organization}
+                    </h2>
+                    <p class="about-block__meta">{entry.period}</p>
+                  </div>
+                  <p class="mt-3 text-base leading-7 text-white/68">
+                    {entry.role}
+                  </p>
+                  <div class="mt-4 space-y-3">
+                    {entry.highlights.map((highlight) => (
+                      <div class="about-line-item">{highlight}</div>
+                    ))}
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="about-compact-panel immersive-panel p-5 sm:p-8">
+          <p class="landing-section-label">Skills</p>
+          <div class="mt-5 grid gap-5 sm:mt-6 sm:gap-6">
+            {
+              PROFILE.skills.map((group) => (
+                <article class="about-block">
+                  <p class="about-block__meta">{group.label}</p>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    {group.items.map((item) => (
+                      <span class="about-chip">{item}</span>
+                    ))}
+                  </div>
+                </article>
+              ))
+            }
+
+            <article class="about-block">
+              <p class="about-block__meta">Certifications</p>
+              <div class="mt-4 space-y-3">
+                {
+                  PROFILE.certifications.map((certification) => (
+                    <div class="about-line-item">{certification}</div>
+                  ))
+                }
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .about-mini-stat__label,
+  .about-case-study__eyebrow,
+  .about-block__meta,
+  .about-hero__rail-label,
+  .about-hero__metric-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  .about-hero {
+    position: relative;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .about-hero__main {
+    max-width: 52rem;
+  }
+
+  .about-hero__title {
+    margin-top: 0.7rem;
+    max-width: 10.2ch;
+    font-size: clamp(2.55rem, 11vw, 5.8rem);
+    line-height: 0.92;
+    letter-spacing: -0.1em;
+    font-weight: 600;
+    color: white;
+    text-wrap: balance;
+  }
+
+  .about-hero__summary {
+    margin-top: 1rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 2vw, 1.16rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .about-hero__impact {
+    margin-top: 1.35rem;
+    display: grid;
+    gap: 0.7rem;
+    max-width: 46rem;
+  }
+
+  .about-hero__impact-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.36);
+  }
+
+  .about-hero__meta {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1px;
+    max-width: 44rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .about-hero__meta-card {
+    display: flex;
+    min-height: 5rem;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.55rem;
+    padding: 0.95rem 1rem;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.015)
+      ),
+      rgba(0, 0, 0, 0.48);
+  }
+
+  .about-hero__meta-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  .about-hero__meta-value {
+    font-size: clamp(0.96rem, 1.25vw, 1.08rem);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.78);
+    text-wrap: balance;
+  }
+
+  .about-hero__links {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.1rem;
+  }
+
+  .about-hero__link {
+    display: flex;
+    min-height: 4.8rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.9rem 1rem;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.015)
+      ),
+      rgba(0, 0, 0, 0.42);
+    color: rgba(255, 255, 255, 0.76);
+    transition:
+      border-color 0.3s ease,
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  .about-hero__link:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+  }
+
+  .about-hero__link-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .about-hero__link-note {
+    font-size: 0.94rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .about-hero__rail {
+    position: relative;
+    display: grid;
+    gap: 1.15rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+  }
+
+  .about-hero__rail-block {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .about-hero__metrics {
+    display: grid;
+    gap: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-hero__metric {
+    min-height: 6.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding: 0.9rem;
+    background: rgba(0, 0, 0, 0.56);
+  }
+
+  .about-hero__metric-value {
+    font-size: clamp(1.55rem, 6vw, 2.65rem);
+    line-height: 0.94;
+    letter-spacing: -0.08em;
+    font-weight: 600;
+    color: white;
+  }
+
+  .about-hero__metric-label {
+    letter-spacing: 0.2em;
+    line-height: 1.45;
+  }
+
+  .about-hero__rail-note {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .about-case-study {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.015)
+      ),
+      rgba(0, 0, 0, 0.48);
+    padding: 1.4rem;
+  }
+
+  .about-case-study__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1.25rem;
+  }
+
+  .about-case-study__title {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.07em;
+    font-weight: 600;
+    color: white;
+  }
+
+  .about-case-study__role {
+    max-width: 20rem;
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .about-case-study__bullet,
+  .about-line-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 0.85rem;
+    font-size: 0.98rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .about-chip {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.45rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.56);
+  }
+
+  .about-block + .about-block {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1.5rem;
+  }
+
+  .about-mini-stat {
+    display: flex;
+    min-height: 7rem;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    padding: 1rem;
+  }
+
+  .about-mini-stat__value {
+    font-size: clamp(1.25rem, 2vw, 1.85rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    font-weight: 600;
+    color: white;
+  }
+
+  @media (min-width: 768px) {
+    .about-hero__meta {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .about-hero__metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .about-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(24rem, 0.92fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    .about-hero__rail {
+      border-top: 0;
+      padding-top: 0.2rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .about-case-study__eyebrow,
+    .about-block__meta,
+    .about-mini-stat__label,
+    .about-hero__rail-label,
+    .about-hero__metric-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+    }
+
+    .about-hero__title {
+      max-width: 11.5ch;
+      font-size: clamp(2rem, 10.5vw, 3rem);
+    }
+
+    .about-hero__summary {
+      margin-top: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .about-hero__impact {
+      margin-top: 1rem;
+      gap: 0.6rem;
+    }
+
+    .about-hero__meta-value,
+    .about-hero__link-note,
+    .about-hero__rail-note {
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .about-hero__links {
+      gap: 0.5rem;
+    }
+
+    .about-hero__link {
+      min-height: auto;
+      gap: 0.35rem;
+      padding: 0.75rem 0.82rem;
+    }
+
+    .about-hero__meta {
+      margin-top: 0.85rem;
+      gap: 1px;
+    }
+
+    .about-hero__meta-card {
+      min-height: auto;
+      gap: 0.45rem;
+      padding: 0.8rem 0.85rem;
+    }
+
+    .about-hero__rail {
+      gap: 0.8rem;
+      padding-top: 0.9rem;
+    }
+
+    .about-hero__metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about-hero__metric {
+      min-height: 5.4rem;
+      padding: 0.8rem;
+    }
+
+    .about-case-study {
+      padding: 1rem;
+    }
+
+    .about-mini-stat {
+      min-height: 4.9rem;
+      gap: 0.4rem;
+      padding: 0.75rem;
+    }
+
+    .about-case-study__header {
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding-bottom: 0.95rem;
+    }
+
+    .about-case-study__title {
+      margin-top: 0.55rem;
+      font-size: clamp(1.5rem, 7.5vw, 2rem);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+    }
+
+    .about-case-study__role {
+      max-width: none;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .about-case-study__bullet,
+    .about-line-item {
+      padding-top: 0.7rem;
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+
+    .about-chip {
+      padding: 0.36rem 0.52rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+    }
+
+    .about-block + .about-block {
+      padding-top: 1rem;
+    }
+
+    .about-compact-panel .about-block + .about-block {
+      padding-top: 0.85rem;
+    }
+
+    .about-compact-panel h2 {
+      font-size: 1.35rem;
+      line-height: 1.05;
+    }
+
+    .about-compact-panel p.text-base,
+    .about-compact-panel p.text-sm {
+      line-height: 1.6;
+    }
+
+    .about-stats-grid .about-mini-stat__label {
+      line-height: 1.35;
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+import { Icon } from 'astro-icon/components'
+import { marked } from 'marked'
+
+export interface PostBlock {
+  id?: string
+  blockType: string
+  orderIndex: number
+  assetId?: string | null
+  payload: Record<string, any>
+}
+
+interface Props {
+  blocks: PostBlock[]
+}
+
+const { blocks = [] } = Astro.props
+
+// Sort blocks by orderIndex
+const sortedBlocks = [...blocks].sort((a, b) => a.orderIndex - b.orderIndex)
+---
+
+<div class="space-y-8">
+  {
+    sortedBlocks.map((block) => {
+      // 1. MARKDOWN / PROSE BLOCK
+      if (block.blockType === 'markdown') {
+        const rawContent = block.payload?.content || ''
+        const parsedHtml = marked.parse(rawContent)
+
+        return (
+          <div
+            class="immersive-prose-shell prose max-w-none text-white/85"
+            set:html={parsedHtml}
+          />
+        )
+      }
+
+      // 2. SYNTAX-HIGHLIGHTED CODE BLOCK
+      if (block.blockType === 'code_snippet') {
+        const lang = block.payload?.language || 'text'
+        const filename = block.payload?.filename || ''
+        const code = block.payload?.code || ''
+
+        return (
+          <div class="my-6 overflow-hidden border border-white/10 bg-black/80">
+            <div class="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-2">
+              <span class="font-mono text-xs text-white/50">
+                {filename || 'snippet'}
+              </span>
+              <span class="font-mono text-[0.66rem] font-semibold uppercase tracking-widest text-emerald-400">
+                {lang}
+              </span>
+            </div>
+            <pre class="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-emerald-400">
+              <code>{code}</code>
+            </pre>
+          </div>
+        )
+      }
+
+      // 3. IMAGE ASSET BLOCK (Google Drive direct CDN embed)
+      if (block.blockType === 'image') {
+        const url = block.payload?.url || ''
+        const caption = block.payload?.caption || ''
+
+        if (!url) return null
+
+        return (
+          <figure class="my-8 border border-white/10 bg-black/40 p-2">
+            <img
+              src={url}
+              alt={caption || 'Attached figure'}
+              class="w-full object-cover"
+              loading="lazy"
+            />
+            {caption && (
+              <figcaption class="mt-2.5 text-center font-mono text-xs text-white/40">
+                // {caption}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+
+      // 4. SECURITY NOTICE / CALLOUT BLOCK
+      if (block.blockType === 'callout') {
+        const title = block.payload?.title || 'Security Notice'
+        const content = block.payload?.content || ''
+
+        return (
+          <aside class="my-6 border-l-2 border-amber-500 bg-amber-500/10 p-4 sm:p-5">
+            <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-amber-400">
+              <Icon name="lucide:alert-triangle" class="size-4 shrink-0" />
+              <span class="font-semibold">{title}</span>
+            </div>
+            <p class="mt-2 text-sm leading-relaxed text-white/80">
+              {content}
+            </p>
+          </aside>
+        )
+      }
+
+      return null
+    })
+  }
+</div>

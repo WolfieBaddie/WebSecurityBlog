@@ -1,0 +1,121 @@
+---
+export interface SegmentOption {
+  value: string
+  label: string
+  dotColor?: 'emerald' | 'amber' | 'cyan' | 'red' | 'purple' | 'white'
+  hint?: string
+}
+
+interface Props {
+  label?: string
+  model: string // Alpine property name to bind to (e.g. 'form.status', 'form.contentType')
+  options: SegmentOption[]
+  showBadge?: boolean
+  class?: string
+}
+
+const {
+  label,
+  model,
+  options,
+  showBadge = false,
+  class: className = '',
+} = Astro.props
+
+const colClass = options.length <= 2 
+  ? 'grid-cols-2' 
+  : options.length === 3 
+  ? 'grid-cols-3' 
+  : options.length === 4 
+  ? 'grid-cols-2 sm:grid-cols-4' 
+  : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'
+---
+
+<div class={`space-y-3 ${className}`}>
+  {
+    (label || showBadge) && (
+      <div class="flex items-center justify-between">
+        {label && (
+          <label class="font-mono text-[0.66rem] tracking-[0.24em] text-white/40 uppercase">
+            {label}
+          </label>
+        )}
+        {showBadge && (
+          <span
+            class="font-mono text-[0.62rem] uppercase tracking-widest px-1.5 py-0.5 border border-white/20 bg-white/5 text-white/70"
+            x-text={model}
+          />
+        )}
+      </div>
+    )
+  }
+
+  <!-- Segmented Frame -->
+  <div class={`grid ${colClass} gap-px border border-white/10 bg-white/[0.04] p-0.5`}>
+    {
+      options.map((opt) => {
+        // Tailwind classes per dot color
+        const dotActive =
+          opt.dotColor === 'emerald'
+            ? 'bg-emerald-400 shadow-[0_0_6px_#10b981]'
+            : opt.dotColor === 'amber'
+            ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]'
+            : opt.dotColor === 'cyan'
+            ? 'bg-cyan-400 shadow-[0_0_6px_#06b6d4]'
+            : opt.dotColor === 'red'
+            ? 'bg-red-400 shadow-[0_0_6px_#ef4444]'
+            : opt.dotColor === 'purple'
+            ? 'bg-purple-400 shadow-[0_0_6px_#a855f7]'
+            : 'bg-white/80'
+
+        const containerActive =
+          opt.dotColor === 'emerald'
+            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+            : opt.dotColor === 'amber'
+            ? "bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+            : opt.dotColor === 'cyan'
+            ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+            : opt.dotColor === 'red'
+            ? "bg-red-500/15 text-red-300 border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.15)]"
+            : "bg-white/10 text-white border-white/30"
+
+        return (
+          <button
+            type="button"
+            @click={`${model} = '${opt.value}'`}
+            :class={`${model} === '${opt.value}' ? '${containerActive}' : 'text-white/40 hover:text-white/80 hover:bg-white/[0.02] border-transparent'`}
+            class="group relative flex flex-col items-center justify-center py-2.5 px-2 border transition-all cursor-pointer"
+          >
+            <div class="flex items-center gap-1.5">
+              {opt.dotColor && (
+                <span
+                  class="size-1.5 rounded-full transition-all"
+                  :class={`${model} === '${opt.value}' ? '${dotActive}' : 'bg-white/20 group-hover:bg-white/40'`}
+                />
+              )}
+              <span class="font-mono text-[0.68rem] tracking-[0.2em] uppercase font-medium">
+                {opt.label}
+              </span>
+            </div>
+          </button>
+        )
+      })
+    }
+  </div>
+
+  <!-- Dynamic Contextual Hint (Optional) -->
+  {
+    options.some((o) => o.hint) && (
+      <div class="font-mono text-[0.62rem] text-white/30 leading-relaxed min-h-[1rem]">
+        {options.map(
+          (opt) =>
+            opt.hint && (
+              <span x-show={`${model} === '${opt.value}'`}>
+                // {opt.hint}
+              </span>
+            )
+        )}
+      </div>
+    )
+  }
+</div>

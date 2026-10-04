@@ -1,0 +1,280 @@
+---
+export const prerender = false // Enable SSR so dynamic database posts load instantly!
+
+import Breadcrumbs from '@/components/breadcrumbs.astro'
+import Link from '@/components/link.astro'
+import PostHead from '@/components/post-head.astro'
+import PostNavigation from '@/components/post-navigation.astro'
+import SubpostsHeader from '@/components/subposts-header.astro'
+import SubpostsSidebar from '@/components/subposts-sidebar.astro'
+import TOCHeader from '@/components/toc-header.astro'
+import TOCSidebar from '@/components/toc-sidebar.astro'
+import BlockviewerAstroComponent, { Blockviewer } from '@/components/content/blockviewer.astro'
+import { Button } from '@/components/ui/button'
+import Layout from '@/layouts/layout.astro'
+import {
+  getAdjacentPosts,
+  getCombinedReadingTime,
+  getParentId,
+  getParentPost,
+  getPostById,
+  getPostReadingTime,
+  getSubpostCount,
+  getTOCSections,
+  hasSubposts,
+  isSubpost,
+  parseAuthors,
+} from '@/lib/data-utils'
+import { formatDate, readingTime } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { render } from 'astro:content'
+import 'katex/dist/katex.min.css'
+
+// Database imports for dynamic posts
+import { db } from '@/server/db/client'
+import { posts, postBlocks } from '@/server/db/schema'
+import { eq, and, asc } from 'drizzle-orm'
+
+const currentPostId = Astro.params.id as string
+
+if (!currentPostId) {
+  return Astro.redirect('/404')
+}
+
+// 1. Try to find post in static Markdown/MDX content collections first
+const staticPost = await getPostById(currentPostId)
+
+let isDbPost = false
+let dbPostData: any = null
+let dbBlocks: any[] = []
+let StaticContent: any = null
+let headings: any[] = []
+let authors: any[] = []
+let postMeta: any = null
+
+if (staticPost) {
+  // Static collection route
+  const rendered = await render(staticPost)
+  StaticContent = rendered.Content
+  headings = rendered.headings
+  authors = await parseAuthors(staticPost.data.authors ?? [])
+  postMeta = staticPost.data
+} else {
+  // 2. Fallback: Query PostgreSQL for published post
+  const foundDbPost = await db.query.posts.findFirst({
+    where: and(eq(posts.slug, currentPostId), eq(posts.status, 'published')),
+  })
+
+  if (!foundDbPost) {
+    return Astro.redirect('/404')
+  }
+
+  isDbPost = true
+  dbPostData = foundDbPost
+
+  // Fetch ordered blocks
+  dbBlocks = await db
+    .select()
+    .from(postBlocks)
+    .where(eq(postBlocks.postId, foundDbPost.id))
+    .orderBy(asc(postBlocks.orderIndex))
+
+  // Estimate reading time from block contents
+  const totalWords = dbBlocks.reduce((acc, b) => {
+    const text = b.payload?.content || b.payload?.code || ''
+    return acc + text.split(/\s+/).filter(Boolean).length
+  }, 0)
+
+  postMeta = {
+    title: foundDbPost.title,
+    description: foundDbPost.summary || '',
+    date: new Date(foundDbPost.publishedAt || foundDbPost.createdAt),
+    tags: [],
+    readingTime: readingTime(totalWords),
+  }
+}
+
+// Subpost and navigation helpers (for static posts)
+const isCurrentSubpost = !isDbPost && isSubpost(currentPostId)
+const navigation = !isDbPost ? await getAdjacentPosts(currentPostId) : { newer: null, older: null, parent: null }
+const parentPost = isCurrentSubpost ? await getParentPost(currentPostId) : null
+const hasChildPosts = !isDbPost ? await hasSubposts(currentPostId) : false
+const subpostCount = !isDbPost && !isCurrentSubpost ? await getSubpostCount(currentPostId) : 0
+const postReadingTime = isDbPost ? postMeta.readingTime : await getPostReadingTime(currentPostId)
+const combinedReadingTime = !isDbPost && hasChildPosts && !isCurrentSubpost
+  ? await getCombinedReadingTime(currentPostId)
+  : null
+const tocSections = !isDbPost ? await getTOCSections(currentPostId) : []
+---
+
+<Layout variant="immersive">
+  {
+    staticPost ? (
+      <PostHead slot="head" post={staticPost} />
+    ) : (
+      <title slot="head">{postMeta.title} | Blog</title>
+      <meta slot="head" name="description" content={postMeta.description} />
+    )
+  }
+
+  {
+    (hasChildPosts || isCurrentSubpost) && (
+      <SubpostsHeader
+        slot="subposts-navigation"
+        parentId={isCurrentSubpost ? getParentId(currentPostId) : currentPostId}
+      />
+    )
+  }
+
+  {
+    headings?.length > 0 &&
+      !(
+        isCurrentSubpost &&
+        headings.length === 1 &&
+        headings[0].text === postMeta.title
+      ) && <TOCHeader slot="table-of-contents" headings={headings} />
+  }
+
+  <section class="relative overflow-hidden border-b border-white/10 bg-black/30">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <Breadcrumbs
+        variant="immersive"
+        items={[
+          { href: '/blog', label: 'Blog', icon: 'lucide:library-big' },
+          ...(isCurrentSubpost && parentPost
+            ? [
+                {
+                  href: `/blog/${parentPost.id}`,
+                  label: parentPost.data.title,
+                  icon: 'lucide:book-open',
+                },
+                {
+                  href: `/blog/${currentPostId}`,
+                  label: postMeta.title,
+                  icon: 'lucide:file-text',
+                },
+              ]
+            : [
+                {
+                  href: `/blog/${currentPostId}`,
+                  label: postMeta.title,
+                  icon: 'lucide:book-open-text',
+                },
+              ]),
+        ]}
+      />
+
+      <div class="mt-8 grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_minmax(280px,0.92fr)] xl:items-start">
+        <div class="immersive-animate-in max-w-4xl" transition:name="page-intro">
+          <p class="landing-section-label">
+            {isCurrentSubpost ? 'Subpost' : 'Note'}
+          </p>
+          <h1
+            class="mt-4 scroll-mt-31 text-[clamp(2.8rem,6vw,5.8rem)] leading-[0.92] font-semibold tracking-[-0.07em] text-white"
+            id="post-title"
+          >
+            {postMeta.title}
+          </h1>
+
+          {
+            authors.length > 0 && (
+              <div class="mt-6 flex flex-wrap gap-3">
+                {authors.map((author) => (
+                  <div class="immersive-chip">
+                    <Image
+                      src={author.avatar}
+                      alt={author.name}
+                      width={20}
+                      height={20}
+                      class="size-5 rounded-full"
+                    />
+                    {author.isRegistered ? (
+                      <Link href={`/authors/${author.id}`} class="text-white">
+                        {author.name}
+                      </Link>
+                    ) : (
+                      <span>{author.name}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          {
+            postMeta.description && (
+              <p class="immersive-copy mt-6 max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
+                {postMeta.description}
+              </p>
+            )
+          }
+        </div>
+
+        <!-- Reading Details Sidebar -->
+        <aside class="immersive-panel immersive-animate-in self-start">
+          <p class="immersive-eyebrow">Reading details</p>
+          <div class="immersive-rule-list mt-6">
+            <div class="space-y-2">
+              <p class="font-mono text-[0.66rem] tracking-[0.26em] text-white/34 uppercase">
+                Published
+              </p>
+              <p class="text-base text-white/68">
+                {formatDate(postMeta.date)}
+              </p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[0.66rem] tracking-[0.26em] text-white/34 uppercase">
+                Reading time
+              </p>
+              <p class="text-base text-white/68">
+                {postReadingTime}
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="border-b border-white/10">
+    <div class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+      <div class="grid gap-10 xl:grid-cols-[16rem_minmax(0,1fr)_16rem] xl:items-start">
+        {tocSections.length > 0 && <TOCSidebar sections={tocSections} currentPostId = {currentPostId}/>}
+
+        <div class="col-start-1 space-y-8 xl:col-start-2">
+          <div class="immersive-prose-shell">
+            <article class="prose max-w-none">
+              {
+                isDbPost ? (
+                  <Blockviewer blocks={dbBlocks} />
+                ) : (
+                  StaticContent && <StaticContent />
+                )
+              }
+            </article>
+          </div>
+
+          {
+            !isDbPost && (
+              <PostNavigation
+                newerPost={navigation.newer}
+                olderPost={navigation.older}
+                parentPost={isCurrentSubpost ? navigation.parent : undefined}
+              />
+            )
+          }
+        </div>
+
+        {
+          (hasChildPosts || isCurrentSubpost) && (
+            <SubpostsSidebar
+              parentId={isCurrentSubpost ? getParentId(currentPostId) : currentPostId}
+            />
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

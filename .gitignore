@@ -1,0 +1,50 @@
+cat << 'EOF' > .gitignore
+# Environment & Secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+credentials.json
+
+# Dependencies
+node_modules/
+package-lock.json.tmp
+
+# Build & Output (Astro, Vite, Next)
+dist/
+build/
+.astro/
+.cache/
+.parcel-cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker & Database Local Storage
+docker/data/
+pgdata/
+*.sqlite
+*.sqlite-journal
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# Temporary & Local files
+tmp/
+temp/
+coverage/
+EOF

@@ -1,0 +1,78 @@
+---
+import { SITE } from '@/consts'
+
+interface Props {
+  title?: string
+  description?: string
+  noindex?: boolean
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  noindex = false,
+} = Astro.props
+const resolvedTitle =
+  title === SITE.title ? SITE.title : `${title} | ${SITE.title}`
+const canonical = new URL(Astro.url.pathname, SITE.href).href
+const image = new URL('/static/1200x630.png', SITE.href).href
+const structuredData = noindex
+  ? null
+  : title === SITE.title
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE.title,
+        url: canonical,
+        description,
+        inLanguage: SITE.locale,
+        author: {
+          '@type': 'Person',
+          name: SITE.author,
+        },
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: title,
+        url: canonical,
+        description,
+        inLanguage: SITE.locale,
+        isPartOf: {
+          '@type': 'WebSite',
+          name: SITE.title,
+          url: SITE.href,
+        },
+      }
+---
+
+<title>{resolvedTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={image} />
+<meta property="og:image:alt" content={title} />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:url" content={canonical} />
+
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={title} />
+<meta name="twitter:card" content="summary_large_image" />
+
+{
+  structuredData && (
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
+    >
+    </script>
+  )
+}

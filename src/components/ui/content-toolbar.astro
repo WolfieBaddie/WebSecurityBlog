@@ -1,0 +1,118 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface FilterOption {
+  id: string
+  label: string
+  countKey?: string // Alpine expression for match count, e.g. 'stats.published'
+}
+
+interface Props {
+  variant?: 'public' | 'admin'
+  searchPlaceholder?: string
+  searchModel?: string
+  sortModel?: string
+  filterModel?: string
+  filters?: FilterOption[]
+  showCount?: boolean
+  class?: string
+}
+
+const {
+  variant = 'public',
+  searchPlaceholder = variant === 'public'
+    ? 'Search notes, CVEs, exploits, or tags...'
+    : 'Search by title, slug, UUID, or summary...',
+  searchModel = 'searchQuery',
+  sortModel = 'sortBy',
+  filterModel = 'activeFilter',
+  filters = [],
+  showCount = true,
+  class: className = '',
+} = Astro.props
+
+const isAdmin = variant === 'admin'
+---
+
+<div class={`space-y-6 border-b border-white/10 pb-6 ${className}`}>
+  <!-- 1. Category / Status Filter Tabs (Optional) -->
+  {
+    filters.length > 0 && (
+      <div class="flex items-center gap-3 overflow-x-auto pb-1">
+        {filters.map((tab) => (
+          <button
+            type="button"
+            @click={`${filterModel} = '${tab.id}'`}
+            :class={`getFilterClass('${tab.id}')`}
+            class="font-mono text-xs uppercase tracking-wider pb-2 cursor-pointer transition-colors whitespace-nowrap"
+          >
+            {tab.label}
+            {tab.countKey && (
+              <span class="text-white/40">
+                (<span x-text={tab.countKey}></span>)
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- 2. Search Bar + Sorting + Match Counter -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <!-- Live Search Input -->
+    <div class="relative w-full sm:max-w-md">
+      <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-white/30">
+        <Icon name="lucide:search" class="size-4" />
+      </div>
+      <input
+        type="text"
+        x-model={searchModel}
+        placeholder={searchPlaceholder}
+        class="w-full border border-white/10 bg-black/60 py-2.5 pl-9 pr-8 font-mono text-xs text-white placeholder:text-white/20 focus:border-white/40 focus:outline-none"
+      />
+      <button
+        type="button"
+        x-show={`${searchModel}.length > 0`}
+        @click={`${searchModel} = ''`}
+        class="absolute inset-y-0 right-0 flex items-center pr-3 font-mono text-xs text-white/40 hover:text-white cursor-pointer"
+        title="Clear search"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Sorting & Actions -->
+    <div class="flex items-center gap-3 self-end sm:self-auto">
+      <span class="font-mono text-[0.68rem] uppercase tracking-wider text-white/40">
+        Sort:
+      </span>
+      <select
+        x-model={sortModel}
+        class="border border-white/10 bg-black px-3 py-1.5 font-mono text-xs text-white focus:border-white/40 focus:outline-none cursor-pointer"
+      >
+        <slot name="sort-options">
+          <option value="created_desc">Newest First</option>
+          <option value="created_asc">Oldest First</option>
+          <option value="title_asc">Title (A-Z)</option>
+          <option value="title_desc">Title (Z-A)</option>
+          {isAdmin && <option value="type">Classification</option>}
+        </slot>
+      </select>
+
+      {
+        showCount && (
+          <>
+            <span class="font-mono text-xs text-white/30">|</span>
+            <span class="font-mono text-xs text-white/40">
+              Matches: <strong class="text-white" x-text="processedPosts.length">0</strong>
+            </span>
+          </>
+        )
+      }
+
+      <!-- Custom slot for extra buttons (e.g. Export, New Post, Toggle Grid) -->
+      <slot name="actions" />
+    </div>
+  </div>
+</div>
