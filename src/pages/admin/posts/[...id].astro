@@ -103,6 +103,11 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
               <div class="flex gap-2">
                 <button
                   type="button"
+                  @click="showImport = !showImport"
+                  class="border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs text-white/70 hover:text-white cursor-pointer"
+                >⇩ Import JSON</button>
+                <button
+                  type="button"
                   @click="addBlock('markdown')"
                   class="border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs text-white/70 hover:text-white"
                 >+ Markdown</button>
@@ -117,6 +122,25 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
                   class="border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-xs text-white/70 hover:text-white"
                 >+ Image</button>
               </div>
+            </div>
+
+            <!-- Agent JSON Import Panel -->
+            <div x-show="showImport" class="border border-white/10 bg-white/[0.02] p-4 space-y-3">
+              <p class="font-mono text-[0.66rem] tracking-[0.24em] text-white/40 uppercase">
+                Paste agent output // docs/agent/post-content-guide.md contract
+              </p>
+              <textarea
+                x-model="importJson"
+                rows="8"
+                placeholder='{"title": "...", "slug": "...", "blocks": [{ "blockType": "markdown", "orderIndex": 0, "payload": { "content": "..." } }]}'
+                class="w-full border border-white/10 bg-black/90 p-3 font-mono text-xs text-emerald-400 placeholder:text-white/20 focus:border-white/40 focus:outline-none"
+              ></textarea>
+              <p x-show="importError" x-text="importError" class="font-mono text-xs text-red-400"></p>
+              <button
+                type="button"
+                @click="importFromJson(importJson)"
+                class="border border-white/20 bg-white px-4 py-1.5 font-mono text-xs font-semibold text-black uppercase hover:bg-white/90 cursor-pointer"
+              >Load into editor</button>
             </div>
 
             <!-- Loop through blocks reactively -->

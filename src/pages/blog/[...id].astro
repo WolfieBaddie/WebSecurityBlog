@@ -9,7 +9,7 @@ import SubpostsHeader from '@/components/subposts-header.astro'
 import SubpostsSidebar from '@/components/subposts-sidebar.astro'
 import TOCHeader from '@/components/toc-header.astro'
 import TOCSidebar from '@/components/toc-sidebar.astro'
-import BlockviewerAstroComponent, { Blockviewer } from '@/components/content/blockviewer.astro'
+import BlockViewer from '@/components/content/blockviewer.astro'
 import { Button } from '@/components/ui/button'
 import Layout from '@/layouts/layout.astro'
 import {
@@ -113,8 +113,10 @@ const tocSections = !isDbPost ? await getTOCSections(currentPostId) : []
     staticPost ? (
       <PostHead slot="head" post={staticPost} />
     ) : (
-      <title slot="head">{postMeta.title} | Blog</title>
-      <meta slot="head" name="description" content={postMeta.description} />
+      <Fragment slot="head">
+        <title>{postMeta.title} | Blog</title>
+        <meta name="description" content={postMeta.description} />
+      </Fragment>
     )
   }
 
@@ -248,7 +250,7 @@ const tocSections = !isDbPost ? await getTOCSections(currentPostId) : []
             <article class="prose max-w-none">
               {
                 isDbPost ? (
-                  <Blockviewer blocks={dbBlocks} />
+                  <BlockViewer blocks={dbBlocks} />
                 ) : (
                   StaticContent && <StaticContent />
                 )

@@ -28,6 +28,9 @@ export function createPostEditor({ isEditMode, postId = '' }: PostEditorOptions)
     isSaving: false,
     isUploading: false,
     uploadError: null as string | null,
+    showImport: false,
+    importError: null as string | null,
+    importJson: '',
     form: {
       title: '',
       slug: '',
@@ -35,6 +38,34 @@ export function createPostEditor({ isEditMode, postId = '' }: PostEditorOptions)
       contentType: 'article',
       status: 'draft',
       blocks: [] as PostBlock[],
+    },
+
+    importFromJson(rawJson: string) {
+      try {
+        const parsed = JSON.parse(rawJson);
+
+        if (!parsed.title || !parsed.slug || !Array.isArray(parsed.blocks)) {
+          this.importError = 'JSON must contain at least: title, slug, blocks[]';
+          return;
+        }
+
+        this.form.title = parsed.title;
+        this.form.slug = parsed.slug;
+        this.form.summary = parsed.summary || '';
+        this.form.contentType = parsed.contentType || 'article';
+        this.form.status = parsed.status || 'draft';
+        this.form.blocks = parsed.blocks.map((b: any, i: number) => ({
+          blockType: b.blockType,
+          orderIndex: b.orderIndex ?? i,
+          assetId: b.assetId ?? null,
+          payload: b.payload || {},
+        }));
+
+        this.importError = null;
+        this.showImport = false;
+      } catch {
+        this.importError = 'Invalid JSON — check syntax and try again';
+      }
     },
 
     async init() {

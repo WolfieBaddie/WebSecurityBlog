@@ -7,6 +7,8 @@ import postsRouter from './routes/posts';
 import { globalErrorHandler } from './middleware/error-handler';
 import { AppError } from './common/response';
 import mediaRouter from './modules/media/media.routes';
+import categoriesRouter from './modules/categories/categories.router';
+import authRouter from './modules/auth/auth.routes';
 
 const app = new Hono().basePath('/api');
 
@@ -16,9 +18,10 @@ app.use('*', logger());
 app.use('*', cors());
 
 // Mount routers
+app.route('/auth', authRouter);
 app.route('/posts', postsRouter);
-
-app.route('/meida', mediaRouter);
+app.route('/categories', categoriesRouter);
+app.route('/media', mediaRouter);
 
 // Fallback 404 for undefined endpoints
 app.notFound((c) => {

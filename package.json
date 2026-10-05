@@ -13,6 +13,7 @@
     "test": "tsx --test tests/ascii-generator-utils.test.ts",
     "preview": "astro preview",
     "astro": "astro",
+    "admin:create": "tsx scripts/create-admin.ts",
     "prettier": "prettier --write **/*.{ts,tsx,css,astro} --ignore-path .gitignore"
   },
   "dependencies": {

@@ -3,9 +3,12 @@ import { db } from '../db/client';
 import { posts, postBlocks } from '../db/schema';
 import { eq, asc, and } from 'drizzle-orm';
 import { responder, AppError } from '../common/response';
+import { requireAuth, requireAuthorOrAdmin, requireAdmin } from '../middleware/auth';
 import type { InferSelectModel } from 'drizzle-orm';
+
 const postsRouter = new Hono();
 type PostBlock = InferSelectModel<typeof postBlocks>;
+
 // ==========================================
 // 1. PUBLIC: List Published Posts
 // ==========================================
@@ -21,47 +24,29 @@ postsRouter.get('/', async (c) => {
 });
 
 // ==========================================
-// ADMIN: List ALL Posts (Drafts, Published, Archived)
+// 2. ADMIN (auth): List ALL Posts (Drafts, Published, Archived)
 // ==========================================
-postsRouter.get('/admin', async (c) => {
+postsRouter.get('/admin', requireAuth, async (c) => {
   const statusParam = c.req.query('status');
 
-  const query = db.select().from(posts);
-  
   const allPosts = statusParam
-    ? await query.where(eq(posts.status, statusParam))
-    : await query;
+    ? await db.select().from(posts).where(eq(posts.status, statusParam))
+    : await db.select().from(posts);
 
   return responder.success(c, allPosts, 200, {
     total: allPosts.length,
   });
 });
 
-postsRouter.get('/admin', async (c) => {
-  try {
-    const statusParam = c.req.query('status');
-    const query = db.select().from(posts);
-
-    const allPosts = statusParam
-      ? await query.where(eq(posts.status, statusParam))
-      : await query;
-
-    return responder.success(c, allPosts, 200, {
-      total: allPosts.length,
-    });
-  } catch (err: any) {
-    return responder.error(c, err.message, 500);
-  }
-});
-
 // ==========================================
-// 2. ADMIN: Fetch Editable Post by UUID
+// 3. ADMIN (auth): Fetch Editable Post by UUID
 // ==========================================
-postsRouter.get('/admin/:id', async (c) => {
+postsRouter.get('/admin/:id', requireAuth, async (c) => {
   const id = c.req.param('id');
 
-  if(!id || id === undefined || id === 'new')
-    throw AppError.badRequest("Invalid post ID provided")
+  if (!id || id === 'undefined' || id === 'new') {
+    throw AppError.badRequest('Invalid post ID provided');
+  }
 
   const post = await db.query.posts.findFirst({
     where: eq(posts.id, id),
@@ -81,12 +66,11 @@ postsRouter.get('/admin/:id', async (c) => {
 });
 
 // ==========================================
-// 3. CREATE: New Post + Blocks
+// 4. CREATE (author/admin): New Post + Blocks
 // ==========================================
-postsRouter.post('/', async (c) => {
+postsRouter.post('/', requireAuthorOrAdmin(), async (c) => {
   const body = await c.req.json();
   const {
-    authorId,
     categoryId,
     slug,
     title,
@@ -96,8 +80,11 @@ postsRouter.post('/', async (c) => {
     blocks = [],
   } = body;
 
-  if (!authorId || !slug || !title) {
-    throw AppError.badRequest('authorId, slug, and title are required fields');
+  // The authenticated operator is the author — never trust client-supplied authorId
+  const authorId = c.get('user').sub;
+
+  if (!slug || !title) {
+    throw AppError.badRequest('slug and title are required fields');
   }
 
   const result = await db.transaction(async (tx) => {
@@ -135,9 +122,9 @@ postsRouter.post('/', async (c) => {
 });
 
 // ==========================================
-// 4. UPDATE: Modify Post and Blocks
+// 5. UPDATE (author/admin): Modify Post and Blocks
 // ==========================================
-postsRouter.put('/:id', async (c) => {
+postsRouter.put('/:id', requireAuthorOrAdmin(), async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
   const { categoryId, slug, title, summary, contentType, status, blocks } = body;
@@ -196,9 +183,9 @@ postsRouter.put('/:id', async (c) => {
 });
 
 // ==========================================
-// 5. SOFT DELETE / ARCHIVE
+// 6. SOFT DELETE / ARCHIVE (author/admin)
 // ==========================================
-postsRouter.patch('/:id/archive', async (c) => {
+postsRouter.patch('/:id/archive', requireAuthorOrAdmin(), async (c) => {
   const id = c.req.param('id');
 
   const [archived] = await db
@@ -215,9 +202,9 @@ postsRouter.patch('/:id/archive', async (c) => {
 });
 
 // ==========================================
-// 6. HARD DELETE
+// 7. HARD DELETE (admin only)
 // ==========================================
-postsRouter.delete('/:id', async (c) => {
+postsRouter.delete('/:id', requireAdmin(), async (c) => {
   const id = c.req.param('id');
 
   const [deleted] = await db
