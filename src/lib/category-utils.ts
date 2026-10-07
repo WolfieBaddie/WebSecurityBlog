@@ -22,7 +22,7 @@ function unwrapError(json: ApiErrorResponse): never{
 
 export async function getAllCategories() : Promise<Category[]>
 {
-    const res = await fetch('api/categories');
+    const res = await fetch('/api/categories');
     const json: ApiResponse<Category[] > | ApiErrorResponse = await res.json();
 
     if(!json.success)
@@ -32,7 +32,7 @@ export async function getAllCategories() : Promise<Category[]>
 
 export async function getCategoryById(id: number): Promise<Category>
 {
-    const res = await fetch(`api/categories/${id}`);
+    const res = await fetch(`/api/categories/${id}`);
     const json: ApiResponse<Category> | ApiErrorResponse = await res.json();
     if(!json.success) return unwrapError(json)
     return json.data;

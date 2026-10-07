@@ -1,0 +1,89 @@
+---
+// Global toast system — pure vanilla DOM, zero Alpine dependency.
+// Included ONCE in the Layout. Usage from anywhere:
+//   window.notify.success('Saved!', 'Title')
+//   window.notify.error('Failed')
+//   window.notify.info('Heads up')
+---
+
+<script>
+  (function () {
+    const CONTAINER_ID = '__toaster_container';
+
+    function ensureContainer() {
+      let el = document.getElementById(CONTAINER_ID);
+      if (!el) {
+        el = document.createElement('div');
+        el.id = CONTAINER_ID;
+        el.className =
+          'pointer-events-none fixed right-4 bottom-4 z-[9999] flex w-[22rem] max-w-[calc(100vw-2rem)] flex-col gap-2';
+        el.setAttribute('aria-live', 'polite');
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+
+    function render(type: string, message: string, title?: string) {
+      const colors =
+        type === 'success'
+          ? 'border-emerald-500/30 bg-[#0a0f0c]/95'
+          : type === 'error'
+            ? 'border-red-500/30 bg-[#120808]/95'
+            : 'border-white/15 bg-[#0a0a0a]/95';
+      const dot =
+        type === 'success'
+          ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]'
+          : type === 'error'
+            ? 'bg-red-400 shadow-[0_0_8px_#ef4444]'
+            : 'bg-white/70';
+
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto flex items-start gap-3 border p-4 backdrop-blur-md ${colors}`;
+      toast.setAttribute('role', 'status');
+
+      const dotEl = document.createElement('span');
+      dotEl.className = `mt-1.5 size-2 shrink-0 rounded-full ${dot}`;
+
+      const body = document.createElement('div');
+      body.className = 'min-w-0 grow';
+      if (title) {
+        const titleEl = document.createElement('p');
+        titleEl.className = 'font-mono text-[0.62rem] tracking-[0.24em] uppercase text-white/60';
+        titleEl.textContent = title; // textContent = XSS-safe
+        body.appendChild(titleEl);
+      }
+      const msgEl = document.createElement('p');
+      msgEl.className = 'mt-0.5 text-sm leading-6 break-words text-white/85';
+      msgEl.textContent = message; // textContent = XSS-safe
+      body.appendChild(msgEl);
+
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className =
+        'shrink-0 font-mono text-xs text-white/30 hover:text-white transition-colors cursor-pointer';
+      close.setAttribute('aria-label', 'Dismiss');
+      close.textContent = '✕';
+      close.addEventListener('click', () => toast.remove());
+
+      toast.appendChild(dotEl);
+      toast.appendChild(body);
+      toast.appendChild(close);
+      ensureContainer().appendChild(toast);
+
+      setTimeout(() => toast.remove(), 5000);
+    }
+
+    // Global API — available the moment this script evaluates
+    (window as any).notify = {
+      success: (m: string, t?: string) => render('success', m, t),
+      error: (m: string, t?: string) => render('error', m, t),
+      info: (m: string, t?: string) => render('info', m, t),
+    };
+
+    // Flush anything queued before this module evaluated
+    const q = (window as any).__toastQueue;
+    if (Array.isArray(q)) {
+      q.splice(0).forEach((item: any) => (window as any).notify[item.type]?.(item.message, item.title));
+    }
+  })();
+</script>

@@ -6,6 +6,7 @@ import PageHead from '@/components/page-head.astro'
 import Layout from '@/layouts/layout.astro'
 import { Icon } from 'astro-icon/components'
 import SegmentedControl from '@/components/ui/segmented-control.astro'
+import DropdownSelect from '@/components/ui/dropdown-select.astro'
 const { id } = Astro.params
 const isEditMode = Boolean(id && id !== 'new')
 const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
@@ -18,7 +19,6 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
   <!-- Alpine Component Root -->
   <div
     x-data={`postEditor({ isEditMode: ${isEditMode}, postId: '${id || ""}' })`}
-    x-init="init()"
     class="min-h-screen"
   >
     <!-- Header / Command Bar -->
@@ -136,6 +136,7 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
                 class="w-full border border-white/10 bg-black/90 p-3 font-mono text-xs text-emerald-400 placeholder:text-white/20 focus:border-white/40 focus:outline-none"
               ></textarea>
               <p x-show="importError" x-text="importError" class="font-mono text-xs text-red-400"></p>
+              <p x-show="importSuccess" x-text="importSuccess" class="font-mono text-xs text-emerald-400"></p>
               <button
                 type="button"
                 @click="importFromJson(importJson)"
@@ -200,15 +201,36 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
         <!-- Right: Status -->
         <aside class="space-y-6">
           <div class="border border-white/10 bg-white/[0.02] p-6 space-y-4 sticky top-24">
-                <SegmentedControl
-                  label="Classification"
-                  model="form.contentType"
-                  options={[
-                    { value: 'article', label: 'Article' },
-                    { value: 'writeup', label: 'Write-Up' },
-                    { value: 'cheatsheet', label: 'Cheat' },
-                  ]}
-                />
+            <p class="font-mono text-[0.66rem] tracking-[0.24em] text-white/38 uppercase">
+              Publication Control
+            </p>
+
+            <div>
+              <DropdownSelect
+                label="Category"
+                model="form.categoryId"
+                optionsRef="categories"
+                placeholder="— No category —"
+                nullable
+                nullableLabel="— No category —"
+              />
+              <p class="mt-1.5 font-mono text-[0.62rem] text-white/30">
+                Manage in
+                <a href="/admin/categories" class="underline hover:text-white/60">Category Manager</a>
+              </p>
+            </div>
+
+            <div class="border-t border-white/10 pt-4">
+              <SegmentedControl
+                label="Classification"
+                model="form.contentType"
+                options={[
+                  { value: 'article', label: 'Article' },
+                  { value: 'writeup', label: 'Write-Up' },
+                  { value: 'cheatsheet', label: 'Cheat' },
+                ]}
+              />
+            </div>
           </div>
         </aside>
       </div>
@@ -217,3 +239,4 @@ const pageTitle = isEditMode ? 'Edit Post' : 'Compose Post'
 </Layout>
 
 <script src="@/scripts/admin/post-editor.ts"></script>
+<script src="@/scripts/admin/page-guard.ts"></script>

@@ -7,6 +7,7 @@ import Footer from '@/components/footer.astro'
 import Head from '@/components/head.astro'
 import Header from '@/components/header.astro'
 import ImmersiveShell from '@/components/landing/immersive-shell.astro'
+import Toaster from '@/components/ui/toaster.astro'
 import { SITE } from '@/consts'
 import { cn } from '@/lib/utils'
 
@@ -69,6 +70,7 @@ const isAtmospheric = isLanding || isImmersive
       <slot />
     </main>
     <Footer />
+    <Toaster />
 
     <script is:inline data-astro-rerun>
       ;(() => {

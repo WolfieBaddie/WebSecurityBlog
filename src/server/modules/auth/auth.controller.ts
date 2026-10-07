@@ -28,6 +28,35 @@ export class AuthController {
     return responder.success(c, { token, user });
   }
 
+  // Classic HTML form fallback: POST form-encoded -> set cookie -> 302 redirect.
+  // No client JS required at all.
+  async loginForm(c: Context) {
+    const form = await c.req.parseBody();
+    const identifier = typeof form['identifier'] === 'string' ? form['identifier'] : '';
+    const password = typeof form['password'] === 'string' ? form['password'] : '';
+    const next = typeof form['next'] === 'string' ? form['next'] : '/admin';
+    const safeNext = next.startsWith('/admin') ? next : '/admin';
+
+    const fail = (msg: string) =>
+      c.redirect(`/admin/login?next=${encodeURIComponent(safeNext)}&error=${encodeURIComponent(msg)}`, 303);
+
+    if (!identifier || !password) return fail('Username and password are required');
+
+    try {
+      const user = await authService.login(identifier, password);
+
+      if (!['admin', 'author', 'reviewer'].includes(user.role)) {
+        return fail('This account has no console access');
+      }
+
+      const token = await createSessionToken({ id: user.id, username: user.username, role: user.role });
+      setCookie(c, SESSION_COOKIE, token, sessionCookieOptions());
+      return c.redirect(safeNext, 303);
+    } catch {
+      return fail('Invalid credentials');
+    }
+  }
+
   async me(c: Context) {
     const sessionUser = c.get('user');
     const user = await authService.getProfile(sessionUser.sub);

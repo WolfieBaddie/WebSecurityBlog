@@ -104,4 +104,21 @@ export function createCategoryEditor()
     }
 }
 
-(window as any).createCategoryEditor = createCategoryEditor;
+// ── Order-safe Alpine registration ─────────────────────────────
+// Works regardless of whether this module evaluates before or after Alpine.start():
+//  • before start → registered during alpine:init (before the DOM walk)
+//  • after start  → registered immediately + re-walks the tree to bind the component
+function registerCategoryEditor(Alpine: any) {
+  Alpine.data('categoryEditor', () => createCategoryEditor());
+}
+
+if ((window as any).Alpine) {
+  registerCategoryEditor((window as any).Alpine);
+  queueMicrotask(() => (window as any).Alpine.initTree?.(document.body));
+} else {
+  document.addEventListener(
+    'alpine:init',
+    () => registerCategoryEditor((window as any).Alpine),
+    { once: true }
+  );
+}

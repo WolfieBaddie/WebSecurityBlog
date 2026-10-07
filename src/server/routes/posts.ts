@@ -18,6 +18,9 @@ postsRouter.get('/', async (c) => {
     .from(posts)
     .where(eq(posts.status, 'published'));
 
+  // Edge-friendly: Cloudflare CDN caches the list for 60s, serves stale while revalidating
+  c.header('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+
   return responder.success(c, publishedPosts, 200, {
     total: publishedPosts.length,
   });

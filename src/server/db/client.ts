@@ -5,11 +5,16 @@ import { drizzle as pgDrizzle } from 'drizzle-orm/postgres-js';
 import ws from 'ws';
 import * as schema from './schema';
 
-// Astro/Vite exposes .env via import.meta.env in SSR; Node scripts use process.env
+// Astro/Vite exposes .env via static import.meta.env access in SSR; Node scripts use process.env
+let envDatabaseUrl: string | undefined;
+try {
+  envDatabaseUrl = import.meta.env.DATABASE_URL;
+} catch {
+  envDatabaseUrl = undefined; // plain Node (tsx scripts)
+}
+
 const connectionString =
-  process.env.DATABASE_URL ||
-  (import.meta as any).env?.DATABASE_URL ||
-  'postgres://postgres:postgresdevpassword@localhost:5432/astro_blog_db';
+  process.env.DATABASE_URL || envDatabaseUrl || 'postgres://postgres:postgresdevpassword@localhost:5432/astro_blog_db';
 
 // Local Docker Postgres speaks raw TCP (postgres.js).
 // Neon speaks WebSocket (neon-serverless). Auto-detect by host.

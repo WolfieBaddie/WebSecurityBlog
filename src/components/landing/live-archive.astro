@@ -1,0 +1,113 @@
+---
+import ContentToolbar from '@/components/ui/content-toolbar.astro'
+import { Icon } from 'astro-icon/components'
+---
+
+<div x-data="liveArchive" class="min-h-[24rem]">
+  <ContentToolbar
+    variant="public"
+    searchPlaceholder="Search the lab — payloads, tooling, techniques..."
+    filterModel="activeFilter"
+    filters={[
+      { id: 'all', label: 'All' },
+      { id: 'writeup', label: 'Write-Ups' },
+      { id: 'article', label: 'Articles' },
+      { id: 'cheatsheet', label: 'Cheatsheets' },
+      { id: 'announcement', label: 'Announcements' },
+    ]}
+  >
+    <Fragment slot="sort-options">
+      <option value="date_desc">Latest</option>
+      <option value="date_asc">Oldest</option>
+      <option value="title_asc">Title (A-Z)</option>
+      <option value="title_desc">Title (Z-A)</option>
+    </Fragment>
+  </ContentToolbar>
+
+  <!-- Loading state -->
+  <div x-show="loading" class="py-14 text-center">
+    <p class="font-mono text-xs tracking-widest text-white/30 uppercase animate-pulse">
+      Syncing archive from the lab...
+    </p>
+  </div>
+
+  <!-- Error state -->
+  <div x-show="loadError" class="py-14 text-center space-y-2">
+    <p class="font-mono text-xs tracking-widest text-red-400/80 uppercase" x-text="loadError"></p>
+    <button
+      type="button"
+      @click="init()"
+      class="font-mono text-xs text-white/50 underline hover:text-white cursor-pointer"
+    >
+      Retry sync
+    </button>
+  </div>
+
+  <!-- Posts list -->
+  <div x-show="!loading && !loadError" class="divide-y divide-white/10">
+    <template x-for="post in processedPosts" :key="post.id">
+      <article class="group grid gap-4 py-6 lg:grid-cols-[9rem_minmax(0,1fr)_auto] lg:items-start lg:gap-8">
+        <div class="space-y-2">
+          <p class="font-mono text-[0.68rem] tracking-[0.28em] text-white/42 uppercase" x-text="formatDate(post.publishedAt || post.createdAt)"></p>
+          <span
+            class="inline-block border px-2 py-0.5 font-mono text-[0.62rem] tracking-[0.18em] text-white/50 uppercase"
+            x-text="post.contentType"
+          ></span>
+        </div>
+
+        <div class="space-y-2 min-w-0">
+          <h3 class="text-[1.4rem] leading-tight font-medium tracking-[-0.04em] text-white">
+            <a :href="`/blog/${post.slug}`" class="hover:underline decoration-white/30 underline-offset-4" x-text="post.title"></a>
+          </h3>
+          <p class="max-w-2xl text-sm leading-6 text-white/55" x-text="post.summary || 'No summary provided.'"></p>
+        </div>
+
+        <div class="flex items-center gap-3 font-mono text-[0.68rem] tracking-[0.2em] uppercase self-start lg:pt-1">
+          <button
+            type="button"
+            @click="copyLink(post.slug)"
+            class="border border-white/10 bg-white/[0.04] px-3 py-1.5 text-white/60 hover:border-white/30 hover:text-white transition-colors cursor-pointer"
+            x-text="copiedSlug === post.slug ? 'Copied' : 'Copy link'"
+          ></button>
+          <a
+            :href="`/blog/${post.slug}`"
+            class="immersive-row-arrow group-hover:translate-x-2 inline-block"
+          >read</a>
+        </div>
+      </article>
+    </template>
+
+    <!-- Empty state -->
+    <div x-show="processedPosts.length === 0" class="py-14 text-center space-y-2">
+      <p class="font-mono text-xs tracking-widest text-white/30 uppercase">No notes match this query</p>
+      <button
+        type="button"
+        @click="searchQuery = ''; activeFilter = 'all'"
+        class="font-mono text-xs text-white/50 underline hover:text-white cursor-pointer"
+      >
+        Reset filters
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  import { createLiveArchive } from '@/scripts/landing/live-archive';
+
+  function registerLiveArchive(Alpine: any) {
+    Alpine.data('liveArchive', () => createLiveArchive());
+  }
+
+  // Order-safe: works whether this module evaluates before or after Alpine.start()
+  if ((window as any).Alpine) {
+    registerLiveArchive((window as any).Alpine);
+    queueMicrotask(() => (window as any).Alpine.initTree?.(document.body));
+  } else {
+    document.addEventListener(
+      'alpine:init',
+      () => registerLiveArchive((window as any).Alpine),
+      { once: true }
+    );
+  }
+</script>

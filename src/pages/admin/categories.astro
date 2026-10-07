@@ -14,7 +14,7 @@ import { Icon } from 'astro-icon/components'
     description="Organize security notes into categories for the public archive and editor."
   />
 
-  <div x-data="createCategoryEditor()" x-init="init()" class="min-h-screen">
+  <div x-data="categoryEditor" class="min-h-screen">
     <!-- Header / Command Bar -->
     <section class="border-b border-white/10 bg-black/40">
       <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8">
@@ -35,14 +35,23 @@ import { Icon } from 'astro-icon/components'
               Category Manager
             </h1>
           </div>
-          <button
-            type="button"
-            @click="startCreate()"
-            x-show="editingId"
-            class="border border-white/20 bg-white/[0.06] px-4 py-2 font-mono text-xs tracking-widest text-white uppercase hover:bg-white/[0.12] cursor-pointer transition-colors"
-          >
-            + New Category
-          </button>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <a
+              href="/admin"
+              class="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-4 py-2 font-mono text-xs tracking-widest text-white/80 uppercase hover:border-white/30 hover:text-white cursor-pointer transition-colors"
+            >
+              ← Back to Dashboard
+            </a>
+            <button
+              type="button"
+              @click="startCreate()"
+              x-show="editingId"
+              class="border border-white/20 bg-white/[0.06] px-4 py-2 font-mono text-xs tracking-widest text-white uppercase hover:bg-white/[0.12] cursor-pointer transition-colors"
+            >
+              + New Category
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -163,3 +172,4 @@ import { Icon } from 'astro-icon/components'
 </Layout>
 
 <script src="@/scripts/admin/category-editor.ts"></script>
+<script src="@/scripts/admin/page-guard.ts"></script>

@@ -2,6 +2,7 @@
 import ArchiveProof from '@/components/landing/archive-proof.astro'
 import LandingAsciiField from '@/components/landing/ascii-field.astro'
 import FeaturedWork from '@/components/landing/featured-work.astro'
+import LiveArchive from '@/components/landing/live-archive.astro'
 import SignalMarquee from '@/components/landing/signal-marquee.astro'
 import Link from '@/components/link.astro'
 import PageHead from '@/components/page-head.astro'
@@ -16,45 +17,22 @@ import {
 const archivePosts = await getRecentPosts(
   Math.max(SITE.featuredPostCount + 1, 4),
 )
-const featuredProjects = await getFeaturedProjects(3)
+// const featuredProjects = await getFeaturedProjects(3)
 const archiveStats = await getArchiveStats()
 const [featuredPost, ...supportingPosts] = archivePosts
-const [nameLineOne = 'Chai', nameLineTwo = 'Pin', nameLineThree = 'Zheng'] =
+const [nameLineOne = 'YXN', nameLineTwo = 'Ecstasy'] =
   LANDING.name.split(' ')
 const heroPills = [
   'NUS CS / First Class track',
   '70% training-efficiency lift',
   '2.5k -> 6k weekly reach',
 ]
-const linkedInLink =
-  PROFILE.links.find((item) => item.label === 'LinkedIn')?.href ??
-  'https://www.linkedin.com/in/chai-pin-zheng/'
+// const linkedInLink =
+//   PROFILE.links.find((item) => item.label === 'LinkedIn')?.href ??
+//   'https://www.linkedin.com/in/chai-pin-zheng/'
 const consoleNotes = [
   'Best fit: technically strong products that still feel too hard to enter, operate, or hand off.',
   'Recent proof: MetaLearner onboarding, GovTech platform tooling, and SAF readiness systems.',
-]
-const proofPoints = [
-  {
-    company: 'MetaLearner',
-    metric: 'Reduced onboarding drop-offs',
-    label: 'Self-serve product adoption',
-    context:
-      'Guided onboarding and a four-category User Guide made a complex forecasting workflow easier to enter and trust.',
-  },
-  {
-    company: 'Singapore Armed Forces',
-    metric: '70% efficiency lift',
-    label: 'Operational readiness systems',
-    context:
-      'Automated fault injection and structured drills lifted training efficiency across a 40+ operator environment.',
-  },
-  {
-    company: 'Government Technology Agency',
-    metric: '2.5k -> 6k weekly users',
-    label: 'Platform delivery + SEO',
-    context:
-      'SEO improvements expanded reach, and Cypress-backed CI removed manual release checking from production merges.',
-  },
 ]
 ---
 
@@ -87,16 +65,14 @@ const proofPoints = [
       class="mx-auto grid min-h-[calc(100svh-4.6rem)] max-w-[1400px] grid-cols-1 px-4 py-6 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:px-8 lg:py-16"
     >
       <div class="flex flex-col justify-between gap-6 sm:gap-10 lg:pr-10">
-        <div class="max-w-4xl" transition:name="page-intro">
+        <div class="max-w-6xl" transition:name="page-intro">
           <p class="landing-kicker">{LANDING.eyebrow}</p>
-          <h1
-            class="landing-wordmark mt-4 text-[clamp(3.3rem,18vw,7rem)] leading-[0.84] font-semibold tracking-[-0.09em] text-white uppercase sm:mt-6 lg:text-[clamp(4rem,14vw,12rem)]"
-          >
-            <span class="block"> {nameLineOne}</span>
-            <!-- ml-[10vw] text-white/68 sm:ml-[18vw] lg:ml-[11vw] -->
-            <span class="block">{nameLineTwo}</span>
-            <span class="block">{nameLineThree}</span>
-          </h1>
+            <h1
+              class="landing-wordmark mt-4 text-[clamp(3.3rem,18vw,7rem)] leading-[0.84] font-semibold tracking-[-0.09em] text-white uppercase sm:mt-6 lg:text-[clamp(4rem,14vw,12rem)]"
+            >
+              <span class="inline-block">{nameLineOne}</span>
+              <span class="ml-4 inline-block text-white/40">{nameLineTwo}</span>
+            </h1>
           <p
             class="landing-manifesto mt-6 max-w-xl text-[0.98rem] leading-7 text-balance text-white/70 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-8"
           >
@@ -142,13 +118,6 @@ const proofPoints = [
             class="hidden flex-wrap items-center gap-4 text-sm text-white/54 sm:flex"
           >
             <span class="text-white/38">Proof path</span>
-            <Link
-              href={linkedInLink}
-              external
-              class="font-mono text-[0.72rem] tracking-[0.24em] text-white/72 uppercase hover:text-white"
-            >
-              View LinkedIn
-            </Link>
             <span class="hidden text-white/22 sm:inline">/</span>
             <span class="text-sm text-white/48">
               Start with the outcomes here, then open the case studies and build
@@ -222,36 +191,10 @@ const proofPoints = [
         </p>
       </div>
 
-      <div class="mt-6 grid gap-4 sm:mt-8 sm:gap-5 lg:grid-cols-3">
-        {
-          proofPoints.map((point) => (
-            <article class="border border-white/10 bg-black/35 px-6 py-6 sm:px-7 sm:py-7">
-              <p class="font-mono text-[0.68rem] tracking-[0.26em] text-white/34 uppercase">
-                {point.company}
-              </p>
-              <p class="mt-4 text-[1.65rem] leading-none font-semibold tracking-[-0.06em] text-white sm:text-[1.9rem]">
-                {point.metric}
-              </p>
-              <p class="mt-2 font-mono text-[0.7rem] tracking-[0.22em] text-white/52 uppercase">
-                {point.label}
-              </p>
-              <p class="mt-5 max-w-[30ch] text-sm leading-7 text-white/60">
-                {point.context}
-              </p>
-            </article>
-          ))
-        }
-      </div>
     </div>
   </section>
 
   <SignalMarquee lines={LANDING.marqueeLines} />
-
-  <FeaturedWork
-    title={LANDING.featuredWorkTitle}
-    intro={LANDING.featuredWorkIntro}
-    projects={featuredProjects}
-  />
 
   <ArchiveProof
     title={LANDING.archiveTitle}
@@ -260,4 +203,25 @@ const proofPoints = [
     supportingPosts={supportingPosts.slice(0, SITE.featuredPostCount)}
     stats={archiveStats}
   />
+
+  <section class="border-t border-white/10 bg-[#050505]">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+      <div class="flex flex-col gap-4 border-b border-white/10 pb-6 sm:gap-5 sm:pb-8 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-2xl">
+          <p class="landing-section-label">Live from the lab</p>
+          <h2 class="landing-section-title mt-4 max-w-xl">
+            Latest notes — searchable, sortable, straight from the database.
+          </h2>
+        </div>
+        <p class="max-w-xl text-sm leading-6 text-white/56 sm:text-base sm:leading-7">
+          The freshest write-ups and cheatsheets, synced live. Search, filter by
+          classification, and jump straight into the proof.
+        </p>
+      </div>
+
+      <div class="mt-6 sm:mt-8">
+        <LiveArchive />
+      </div>
+    </div>
+  </section>
 </Layout>

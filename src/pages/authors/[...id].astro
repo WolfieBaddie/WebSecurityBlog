@@ -73,7 +73,7 @@ const socialLinks = [
     <div slot="aside">
       <div class="flex items-center gap-4">
         <AvatarComponent
-          client:load
+          client:idle
           src={author.data.avatar}
           alt={`Avatar of ${author.data.name}`}
           fallback={author.data.name[0]}

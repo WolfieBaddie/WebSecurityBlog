@@ -42,4 +42,20 @@ export function createLoginForm({ next }: { next: string }) {
   };
 }
 
-(window as any).createLoginForm = createLoginForm;
+// ── Order-safe Alpine registration ─────────────────────────────
+function registerLoginForm(Alpine: any) {
+  Alpine.data('createLoginForm', (opts?: { next?: string }) =>
+    createLoginForm(opts ?? { next: '/admin' })
+  );
+}
+
+if ((window as any).Alpine) {
+  registerLoginForm((window as any).Alpine);
+  queueMicrotask(() => (window as any).Alpine.initTree?.(document.body));
+} else {
+  document.addEventListener(
+    'alpine:init',
+    () => registerLoginForm((window as any).Alpine),
+    { once: true }
+  );
+}

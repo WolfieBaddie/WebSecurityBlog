@@ -154,3 +154,11 @@ CREATE TABLE eval.options (
     is_correct BOOLEAN NOT NULL DEFAULT FALSE,
     order_index INT NOT NULL DEFAULT 0
 );
+
+-- ── Performance indexes (added pre-deploy) ──────────────────
+CREATE INDEX IF NOT EXISTS idx_posts_status ON content.posts(status);
+CREATE INDEX IF NOT EXISTS idx_posts_category ON content.posts(category_id);
+CREATE INDEX IF NOT EXISTS idx_post_blocks_post ON content.post_blocks(post_id);
+CREATE INDEX IF NOT EXISTS idx_submissions_user ON challenges.submissions(user_id);
+CREATE INDEX IF NOT EXISTS idx_submissions_challenge ON challenges.submissions(challenge_id);
+CREATE INDEX IF NOT EXISTS idx_media_uploader ON media.assets(uploader_id);

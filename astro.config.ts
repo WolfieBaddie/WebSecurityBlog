@@ -29,8 +29,11 @@ const isProduction = process.env.NODE_ENV === 'production' || process.env.CF_PAG
 
 export default defineConfig({
   site: resolveSiteUrl(siteEnv),
+  // NOTE: prefetch config removed — Astro 6.0.2 dev-mode prefetch client breaks under
+  // Vite dep optimization (__PREFETCH_PREFETCH_ALL__ ReferenceError).
+  // Cloudflare serves prerendered pages from edge anyway; re-test prefetch after Astro patch releases.
   adapter: isProduction ? cloudflare({ imageService: 'passthrough' })
-  : node({mode : 'standalone'}), 
+  : node({mode : 'standalone'}),
   integrations: [mdx(), react(), sitemap(), icon(), alpinejs()],
   vite: {
     // Astro and the Tailwind Vite plugin can resolve slightly different Vite types.

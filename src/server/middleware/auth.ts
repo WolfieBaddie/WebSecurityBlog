@@ -18,9 +18,16 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 type Env = { Variables: { user: SessionUser } };
 
 function getJwtSecret(): string {
-  const secret =
-    process.env.JWT_SECRET ||
-    (import.meta as any)?.env?.JWT_SECRET;
+  let secret: string | undefined;
+
+  // Static member access — Vite's module runner rejects dynamic import.meta.env lookups.
+  try {
+    secret = import.meta.env.JWT_SECRET;
+  } catch {
+    secret = undefined; // plain Node (tsx scripts) — import.meta.env doesn't exist
+  }
+
+  if (!secret) secret = process.env.JWT_SECRET;
 
   if (!secret) {
     throw new AppError(
