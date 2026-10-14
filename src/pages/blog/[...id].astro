@@ -29,7 +29,6 @@ import { formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import { render } from 'astro:content'
-import 'katex/dist/katex.min.css'
 
 // Database imports for dynamic posts
 import { db } from '@/server/db/client'
@@ -52,6 +51,15 @@ let StaticContent: any = null
 let headings: any[] = []
 let authors: any[] = []
 let postMeta: any = null
+
+
+if (Astro.response) {
+  // Edge caches HTML for 1 hour; serves stale in background while revalidating
+  Astro.response.headers.set(
+    'Cache-Control',
+    'public, s-maxage=3600, stale-while-revalidate=86400'
+  )
+}
 
 if (staticPost) {
   // Static collection route
@@ -106,11 +114,24 @@ const combinedReadingTime = !isDbPost && hasChildPosts && !isCurrentSubpost
   ? await getCombinedReadingTime(currentPostId)
   : null
 const tocSections = !isDbPost ? await getTOCSections(currentPostId) : []
+const hasMath = isDbPost ? dbBlocks.some((b) => b.payload?.content?.includes('$')) : Boolean(staticPost?.body?.includes('$'))
 ---
 
 <Layout variant="immersive">
-  {
-    staticPost ? (
+  {  
+    hasMath &&
+      (
+        <link 
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+      crossorigin="anonymous"
+      slot="head"
+      />
+      )
+    }
+
+    {
+      staticPost ? (
       <PostHead slot="head" post={staticPost} />
     ) : (
       <Fragment slot="head">
@@ -118,7 +139,8 @@ const tocSections = !isDbPost ? await getTOCSections(currentPostId) : []
         <meta name="description" content={postMeta.description} />
       </Fragment>
     )
-  }
+    }
+  
 
   {
     (hasChildPosts || isCurrentSubpost) && (

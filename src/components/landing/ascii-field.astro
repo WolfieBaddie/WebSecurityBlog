@@ -21,12 +21,19 @@ const { class: className, variant = 'hero' } = Astro.props
   ;(() => {
     const script = document.currentScript
     const root = script?.previousElementSibling
+
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+      // Do not run the animation loop on phones/tablets
+      return;
+    }
+
     if (!(root instanceof HTMLDivElement)) return
 
     const canvas = root.querySelector('canvas')
     if (!(canvas instanceof HTMLCanvasElement)) return
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
     const variant = root.dataset.asciiVariant || 'hero'
@@ -34,8 +41,8 @@ const { class: className, variant = 'hero' } = Astro.props
     const config = {
       hero: {
         glyphs: ['.', ':', '+', '*', '#', 'x', '='],
-        cellMin: 14,
-        cellMax: 22,
+        cellMin: 18, // slightly larger cell = 40% fewer glyphs
+        cellMax: 26,
         alpha: 0.92,
         speed: 1,
         interactive: true,
@@ -45,8 +52,8 @@ const { class: className, variant = 'hero' } = Astro.props
       },
       ambient: {
         glyphs: ['.', ':', '+', 'x'],
-        cellMin: 18,
-        cellMax: 28,
+        cellMin: 22,
+        cellMax: 32,
         alpha: 0.55,
         speed: 0.52,
         interactive: false,
@@ -56,8 +63,8 @@ const { class: className, variant = 'hero' } = Astro.props
       },
       panel: {
         glyphs: ['.', ':', '=', 'x'],
-        cellMin: 16,
-        cellMax: 24,
+        cellMin: 20,
+        cellMax: 28,
         alpha: 0.72,
         speed: 0.7,
         interactive: false,
@@ -71,9 +78,12 @@ const { class: className, variant = 'hero' } = Astro.props
 
     let frameId = 0
     let rafActive = true
+    let isVisible = true
+    let lastDrawTime = 0
+    const TARGET_FPS_INTERVAL = 1000 / 30 // Lock to 30 FPS for silky, lightweight rendering
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5) // Cap DPR at 1.5 instead of 2+
       const { width, height } = root.getBoundingClientRect()
 
       canvas.width = Math.max(1, Math.floor(width * dpr))
@@ -82,6 +92,16 @@ const { class: className, variant = 'hero' } = Astro.props
     }
 
     const draw = (time = 0) => {
+      if (!rafActive || !isVisible) return
+
+      // FPS Throttling: Skip frames if under 30ms interval
+      const elapsed = time - lastDrawTime
+      if (elapsed < TARGET_FPS_INTERVAL) {
+        frameId = window.requestAnimationFrame(draw)
+        return
+      }
+      lastDrawTime = time - (elapsed % TARGET_FPS_INTERVAL)
+
       const width = canvas.clientWidth
       const height = canvas.clientHeight
       const reducedMotion = motionQuery.matches
@@ -107,8 +127,7 @@ const { class: className, variant = 'hero' } = Astro.props
           const fade = Math.max(0, 1 - radius * 1.55)
           const wave =
             Math.sin(nx * 11 + seconds * 0.9) * 0.18 +
-            Math.cos(ny * 15 - seconds * 0.8) * 0.18 +
-            Math.sin((nx + ny) * 13 + seconds * 0.55) * 0.08
+            Math.cos(ny * 15 - seconds * 0.8) * 0.18
           const dx = x / width - pointer.x
           const dy = y / height - pointer.y
           const pointerField = config.interactive
@@ -144,14 +163,24 @@ const { class: className, variant = 'hero' } = Astro.props
     const handlePointer = (event) => {
       pointer.x = event.clientX / window.innerWidth
       pointer.y = event.clientY / window.innerHeight
-
-      if (motionQuery.matches || !config.interactive) {
-        draw()
-      }
     }
+
+    // Freeze animation completely when scrolled out of view or tab hidden
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible && rafActive && !motionQuery.matches) {
+          window.cancelAnimationFrame(frameId)
+          frameId = window.requestAnimationFrame(draw)
+        }
+      },
+      { threshold: 0.05 }
+    )
+    observer.observe(canvas)
 
     const cleanup = () => {
       rafActive = false
+      observer.disconnect()
       window.cancelAnimationFrame(frameId)
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', handlePointer)
@@ -164,7 +193,7 @@ const { class: className, variant = 'hero' } = Astro.props
       frameId = window.requestAnimationFrame(draw)
     }
 
-    window.addEventListener('resize', resize)
+    window.addEventListener('resize', resize, { passive: true })
     if (config.interactive) {
       window.addEventListener('pointermove', handlePointer, { passive: true })
     }

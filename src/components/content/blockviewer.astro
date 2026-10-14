@@ -73,6 +73,7 @@ const sortedBlocks = [...blocks].sort((a, b) => a.orderIndex - b.orderIndex)
               alt={caption || 'Attached figure'}
               class="w-full object-cover"
               loading="lazy"
+              decoding="async"
             />
             {caption && (
               <figcaption class="mt-2.5 text-center font-mono text-xs text-white/40">
