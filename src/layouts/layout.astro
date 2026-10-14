@@ -43,7 +43,7 @@ const isAtmospheric = isLanding || isImmersive
     data-route-shell={variant}
   >
     <a href="#main-content" class="skip-link"> Skip to main content </a>
-    {isImmersive && <ImmersiveShell />}
+    {isLanding && <ImmersiveShell />}
     <header
       class={cn(
         'sticky top-0 z-50',
