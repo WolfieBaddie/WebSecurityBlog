@@ -1,0 +1,164 @@
+---
+import Breadcrumbs from '@/components/breadcrumbs.astro'
+import PageHead from '@/components/page-head.astro'
+import Link from '@/components/link.astro'
+import Layout from '@/layouts/layout.astro'
+import { LANDING, PROFILE } from '@/consts'
+
+const emailLink =
+  PROFILE.links.find((item) => item.label === 'Email')?.href ?? 'mailto:contact@yourdomain.com'
+
+const lastUpdated = 'October 7, 2026'
+---
+
+<Layout variant="immersive">
+  <PageHead
+    slot="head"
+    title="Terms of Use & Security Disclaimer"
+    description="Educational-use terms, ethical security framing, and liability notice for this site."
+  />
+
+  <section class="relative overflow-hidden border-b border-white/10 bg-black/30">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-20">
+      <Breadcrumbs
+        variant="immersive"
+        items={[
+          { label: 'Site', href: '/', icon: 'lucide:home' },
+          { label: 'Terms of Use', icon: 'lucide:scale' },
+        ]}
+      />
+
+      <div class="mt-8 max-w-4xl immersive-animate-in" transition:name="page-intro">
+        <p class="landing-section-label">Legal // Terms & ethics</p>
+        <h1 class="mt-4 text-[clamp(2.6rem,5vw,4.4rem)] leading-[0.94] font-semibold tracking-[-0.06em] text-white">
+          Terms of Use &amp; Security Disclaimer
+        </h1>
+        <p class="mt-4 font-mono text-xs tracking-[0.18em] text-white/40 uppercase">
+          Last updated: {lastUpdated}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-white/10">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+      <div class="grid gap-10 xl:grid-cols-[16rem_minmax(0,1fr)] xl:items-start">
+        <aside class="hidden xl:block sticky top-24 space-y-2 font-mono text-xs text-white/40">
+          <p class="text-[0.62rem] tracking-[0.24em] text-white/30 uppercase">On this page</p>
+          {
+            [
+              ['#education', '01 — Educational purpose'],
+              ['#authorization', '02 — Authorization notice'],
+              ['#lawful', '03 — Lawful use only'],
+              ['#accuracy', '04 — Content accuracy'],
+              ['#links', '05 — Third-party links'],
+              ['#license', '06 — Code & licensing'],
+              ['#liability', '07 — Limitation of liability'],
+              ['#contact', '08 — Contact'],
+            ].map(([href, label]) => (
+              <a href={href} class="block py-1 transition-colors hover:text-white">
+                {label}
+              </a>
+            ))
+          }
+        </aside>
+
+        <article class="immersive-prose-shell">
+          <div class="prose max-w-none text-white/80 prose-headings:text-white prose-a:text-white prose-strong:text-white prose-li:text-white/75 prose-hr:border-white/10">
+            <div class="my-8 border-l-2 border-amber-500 bg-amber-500/10 p-5">
+              <div class="flex items-center gap-2 font-mono text-[0.66rem] tracking-[0.24em] text-amber-400 uppercase">
+                Authorization required
+              </div>
+              <p class="mt-2 text-sm leading-6 text-white/80">
+                The techniques, payloads, and code published on this site are for
+                <strong>educational and research purposes only</strong>. Use them
+                <strong>only</strong> against systems you own or for which you have
+                explicit, written authorization to test. Unauthorized access to computer
+                systems is a crime in most jurisdictions.
+              </p>
+            </div>
+
+            <h2 id="education">01 — Educational purpose</h2>
+            <p>
+              {LANDING.name} // Security Lab is a knowledge-sharing publication about
+              offensive and defensive security. Its purpose is to teach the mechanisms
+              behind vulnerabilities, exploits, and detections so practitioners can
+              understand them — how to reproduce them safely in isolated labs, and how to
+              defend against them in production. Nothing on this site is intended to
+              facilitate unlawful activity.
+            </p>
+
+            <h2 id="authorization">02 — Authorization notice</h2>
+            <p>
+              Every technique presented here assumes an authorized lab or engagement
+              context: a virtual machine you own, a lab network you built, or a system
+              with signed permission. If you lack authorization for a system, do not
+              test it. The author publishes proof-of-concept material in that spirit and
+              expects readers to uphold the same standard.
+            </p>
+
+            <h2 id="lawful">03 — Lawful use only</h2>
+            <p>
+              You agree to use this site's content in compliance with all applicable
+              laws and regulations, including computer crime, privacy, and
+              anti-cybercrime statutes (e.g. the Computer Fraud and Abuse Act, the UK
+              Computer Misuse Act, and equivalents in your jurisdiction). This site does
+              not endorse, support, or encourage attacks on systems you do not own or
+              control.
+            </p>
+
+            <h2 id="accuracy">04 — Content accuracy</h2>
+            <p>
+              Security evolves rapidly. Techniques, payloads, and version-specific
+              behaviors may become outdated or behave differently in your environment.
+              Content is provided "as is" without warranty of any kind. Always validate
+              claims in your own lab before relying on them, and verify CVE and
+              patch-level details against authoritative sources.
+            </p>
+
+            <h2 id="links">05 — Third-party links</h2>
+            <p>
+              This site links to external resources (references, advisories, vendor
+              pages). Those sites have their own terms and privacy policies, and the
+              author has no control over their content or availability. Follow external
+              links at your own discretion.
+            </p>
+
+            <h2 id="license">06 — Code &amp; licensing</h2>
+            <p>
+              Code snippets, scripts, and lab tooling published on this site are provided
+              for educational use. Article text remains the property of the author unless
+              otherwise stated; you may quote short excerpts with attribution and a link.
+              Reproducing whole articles or repackaging them commercially is not
+              permitted without permission.
+            </p>
+
+            <h2 id="liability">07 — Limitation of liability</h2>
+            <p>
+              In no event shall the author be liable for any direct, indirect, incidental,
+              consequential, or punitive damages — including but not limited to data loss,
+              system compromise, or legal consequences — arising from the use or misuse of
+              this site's content. You are solely responsible for how you apply the
+              knowledge published here.
+            </p>
+
+            <h2 id="contact">08 — Contact</h2>
+            <p>
+              Questions about these terms, licensing requests, or coordinated disclosure
+              of a vulnerability:
+            </p>
+            <p>
+              <Link
+                href={emailLink}
+                external
+                class="font-mono text-sm text-white underline decoration-white/30 underline-offset-4 hover:text-emerald-400"
+              >
+                {emailLink.replace('mailto:', '')}
+              </Link>
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</Layout>

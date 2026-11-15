@@ -279,8 +279,16 @@ export const FOOTER: FooterContent = {
       label: 'RSS',
     },
     {
-      href: '/signal-room/ascii-signal',
-      label: 'ASCII Playground',
+      href: '/about',
+      label: 'About',
+    },
+    {
+      href: '/privacy',
+      label: 'Privacy',
+    },
+    {
+      href: '/terms',
+      label: 'Terms',
     },
   ],
   signature: `${LANDING.name} / ${currentYear}`,

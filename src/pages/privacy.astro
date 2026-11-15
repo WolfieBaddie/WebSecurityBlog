@@ -1,0 +1,283 @@
+---
+import Breadcrumbs from '@/components/breadcrumbs.astro'
+import PageHead from '@/components/page-head.astro'
+import Link from '@/components/link.astro'
+import Layout from '@/layouts/layout.astro'
+import { LANDING, PROFILE } from '@/consts'
+
+const emailLink =
+  PROFILE.links.find((item) => item.label === 'Email')?.href ?? 'mailto:contact@yourdomain.com'
+
+const lastUpdated = 'October 7, 2026'
+
+const cookies = [
+  {
+    name: 'erudite_session',
+    purpose: 'Keeps signed-in operators authenticated to the admin console (signed JWT, expires in 7 days).',
+    type: 'Functional — required for admin login',
+  },
+  {
+    name: '__cf_bm',
+    purpose: 'Cloudflare bot-management cookie that filters automated traffic (set by Cloudflare, expires in 30 minutes).',
+    type: 'Security — set by Cloudflare',
+  },
+  {
+    name: 'cf_clearance',
+    purpose: 'Set when a visitor passes a Cloudflare challenge (e.g. a Turnstile check). Expires in 30 minutes to 1 year.',
+    type: 'Security — set by Cloudflare',
+  },
+  {
+    name: 'Google AdSense cookies (e.g. DoubleClick DART / __gads / IDE)',
+    purpose: 'If advertising is enabled on this site, Google and its partners use cookies to serve ads based on your prior visits to this and other websites. Currently, this site may display advertising provided by Google.',
+    type: 'Advertising — set by Google (manageable at adssettings.google.com)',
+  },
+]
+---
+
+<Layout variant="immersive">
+  <PageHead
+    slot="head"
+    title="Privacy Policy"
+    description="How this site handles your data, cookies, and advertising."
+  />
+
+  <section class="relative overflow-hidden border-b border-white/10 bg-black/30">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-20">
+      <Breadcrumbs
+        variant="immersive"
+        items={[
+          { label: 'Site', href: '/', icon: 'lucide:home' },
+          { label: 'Privacy Policy', icon: 'lucide:shield-check' },
+        ]}
+      />
+
+      <div class="mt-8 max-w-4xl immersive-animate-in" transition:name="page-intro">
+        <p class="landing-section-label">Legal // Privacy</p>
+        <h1 class="mt-4 text-[clamp(2.6rem,5vw,4.4rem)] leading-[0.94] font-semibold tracking-[-0.06em] text-white">
+          Privacy Policy
+        </h1>
+        <p class="mt-4 font-mono text-xs tracking-[0.18em] text-white/40 uppercase">
+          Last updated: {lastUpdated}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-white/10">
+    <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+      <div class="grid gap-10 xl:grid-cols-[16rem_minmax(0,1fr)] xl:items-start">
+        <aside class="hidden xl:block sticky top-24 space-y-2 font-mono text-xs text-white/40">
+          <p class="text-[0.62rem] tracking-[0.24em] text-white/30 uppercase">On this page</p>
+          {
+            [
+              ['#who', '01 — Who we are'],
+              ['#collection', '02 — What we collect'],
+              ['#cookies', '03 — Cookies'],
+              ['#adsense', '04 — Google advertising'],
+              ['#analytics', '05 — Analytics'],
+              ['#third-party', '06 — Third-party services'],
+              ['#gdpr', '07 — GDPR rights'],
+              ['#ccpa', '08 — CCPA rights'],
+              ['#retention', '09 — Retention & security'],
+              ['#children', '10 — Children'],
+              ['#changes', '11 — Changes'],
+              ['#contact', '12 — Contact'],
+            ].map(([href, label]) => (
+              <a href={href} class="block py-1 transition-colors hover:text-white">
+                {label}
+              </a>
+            ))
+          }
+        </aside>
+
+        <article class="immersive-prose-shell">
+          <div class="prose max-w-none text-white/80 prose-headings:text-white prose-a:text-white prose-strong:text-white prose-li:text-white/75 prose-code:text-emerald-400 prose-hr:border-white/10">
+            <h2 id="who">01 — Who we are</h2>
+            <p>
+              {LANDING.name} // Security Lab ("this site") is an independent, operator-run
+              publication sharing cybersecurity knowledge, lab write-ups, and challenge
+              content. This site is operated and maintained by a single author. For any
+              privacy question, contact us via the email address at the end of this page.
+            </p>
+
+            <h2 id="collection">02 — What we collect</h2>
+            <p>This site is deliberately low-data. We collect:</p>
+            <ul>
+              <li>
+                <strong>Server and log data:</strong> IP address, browser type, device
+                type, referring page, and timestamps — processed by our CDN provider
+                (Cloudflare) to route traffic, block abuse, and generate aggregate
+                statistics. This is standard server infrastructure data.
+              </li>
+              <li>
+                <strong>Information you voluntarily provide:</strong> when you email us,
+                we receive your name, email address, and message contents.
+              </li>
+              <li>
+                <strong>Operator account data:</strong> registered operators (the author)
+                store a username, email, and salted password hash. Passwords are hashed
+                with PBKDF2-SHA-256 and never stored or transmitted in plaintext.
+              </li>
+            </ul>
+            <p>We do not collect payment information, and we do not sell personal information.</p>
+
+            <h2 id="cookies">03 — Cookies</h2>
+            <p>We use the minimum cookies necessary. The table below lists each one.</p>
+            <div class="my-6 overflow-x-auto border border-white/10">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-white/10 bg-white/[0.03] font-mono text-[0.62rem] tracking-[0.18em] text-white/40 uppercase">
+                  <tr>
+                    <th class="p-3">Cookie</th>
+                    <th class="p-3">Purpose</th>
+                    <th class="p-3">Type</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  {
+                    cookies.map((c) => (
+                      <tr>
+                        <td class="p-3 font-mono text-xs text-emerald-400/90 align-top">
+                          {c.name}
+                        </td>
+                        <td class="p-3 text-xs leading-5 text-white/65">{c.purpose}</td>
+                        <td class="p-3 text-xs leading-5 text-white/40 align-top">{c.type}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <h2 id="adsense">04 — Google advertising and third-party vendors</h2>
+            <p>
+              This site is a participant in the Google AdSense program (or may display
+              advertising provided by Google). This section discloses what that means
+              for you, as required by Google's policies:
+            </p>
+            <ul>
+              <li>
+                <strong>Third-party vendors, including Google, use cookies to serve ads
+                based on a user's prior visits to this website or other websites.</strong>
+              </li>
+              <li>
+                <strong>Google's use of advertising cookies enables it and its partners
+                to serve ads to you based on your visit to this site and/or other sites
+                on the Internet.</strong>
+              </li>
+              <li>
+                You may opt out of personalized advertising by visiting
+                <a href="https://www.adssettings.google.com" rel="nofollow noopener" target="_blank">Google Ads Settings</a>,
+                or opt out of third-party vendors' use of cookies for personalized
+                advertising at
+                <a href="https://www.aboutads.info/choices/" rel="nofollow noopener" target="_blank">aboutads.info/choices</a>.
+              </li>
+              <li>
+                For more information about how Google uses data when you use partner
+                sites, see
+                <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow noopener" target="_blank">Google's partner-sites page</a>,
+                and for the general ad policies see
+                <a href="https://policies.google.com/technologies/ads" rel="nofollow noopener" target="_blank">policies.google.com/technologies/ads</a>.
+              </li>
+              <li>
+                <strong>EEA, UK, and Switzerland visitors:</strong> where required by law,
+                personalized advertising is only served after consent is captured through
+                a Google-certified consent management platform. You can change your
+                consent choices at any time through the consent message shown when you
+                first visit.
+              </li>
+            </ul>
+
+            <h2 id="analytics">05 — Analytics</h2>
+            <p>
+              We use Cloudflare's privacy-first analytics to understand aggregate traffic
+              patterns (page views, referrers, country-level data). No cross-site
+              tracking cookies are set for analytics purposes.
+            </p>
+
+            <h2 id="third-party">06 — Third-party services</h2>
+            <p>We work with the following processors, each with their own privacy policies:</p>
+            <ul>
+              <li>
+                <strong>Cloudflare</strong> (CDN, DDoS protection, bot management, analytics) —
+                <a href="https://www.cloudflare.com/privacypolicy/" rel="nofollow noopener" target="_blank">cloudflare.com/privacypolicy</a>
+              </li>
+              <li>
+                <strong>Neon</strong> (PostgreSQL database hosting) —
+                <a href="https://neon.tech/privacy-policy" rel="nofollow noopener" target="_blank">neon.tech/privacy-policy</a>
+              </li>
+              <li>
+                <strong>Google</strong> (advertising, if enabled; Google Drive for stored
+                image assets) —
+                <a href="https://policies.google.com/privacy" rel="nofollow noopener" target="_blank">policies.google.com/privacy</a>
+              </li>
+            </ul>
+            <p>
+              These providers only receive the data necessary to perform their service
+              for this site.
+            </p>
+
+            <h2 id="gdpr">07 — Your rights (GDPR / UK GDPR)</h2>
+            <p>If you are in the EEA or UK, you have the right to:</p>
+            <ul>
+              <li>Access the personal data we hold about you (you may email us to request a copy);</li>
+              <li>Request correction of inaccurate data;</li>
+              <li>Request deletion of your data (e.g. your operator account);</li>
+              <li>Request portability of your data;</li>
+              <li>Object to or restrict processing, and to lodge a complaint with your local data protection authority.</li>
+            </ul>
+            <p>
+              For advertising cookies, use the opt-out links in section 04 — that consent
+              is managed directly by Google, not by this site.
+            </p>
+
+            <h2 id="ccpa">08 — Your rights (California / CCPA)</h2>
+            <p>
+              California residents have the right to know what personal information is
+              collected, the right to request deletion, the right to opt out of
+              "selling" or "sharing" personal information, and the right to
+              non-discrimination for exercising these rights. <strong>This site does not
+              sell personal information.</strong> To exercise any right, contact us at
+              the address in section 12.
+            </p>
+
+            <h2 id="retention">09 — Retention and security</h2>
+            <p>
+              Log data is retained by Cloudflare per its standard retention windows.
+              Operator account data is retained until you request deletion. Passwords
+              are protected with PBKDF2-SHA-256 hashing (100,000 iterations). Session
+              tokens are signed with a secret and expire automatically after 7 days.
+            </p>
+
+            <h2 id="children">10 — Children's privacy</h2>
+            <p>
+              This site is not directed at children under 13, and we do not knowingly
+              collect personal information from children. If you believe a child has
+              provided us data, contact us and we will delete it.
+            </p>
+
+            <h2 id="changes">11 — Changes to this policy</h2>
+            <p>
+              We may update this policy as the site evolves (for example, if advertising
+              is introduced or expanded). Changes are posted on this page with a revised
+              "Last updated" date. Material changes will be announced on the blog.
+            </p>
+
+            <h2 id="contact">12 — Contact</h2>
+            <p>
+              For privacy questions, access requests, or deletion requests:
+            </p>
+            <p>
+              <Link
+                href={emailLink}
+                external
+                class="font-mono text-sm text-white underline decoration-white/30 underline-offset-4 hover:text-emerald-400"
+              >
+                {emailLink.replace('mailto:', '')}
+              </Link>
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</Layout>
