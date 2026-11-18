@@ -1,13 +1,13 @@
-# Chai Pin Zheng
+# YxngEcstasy // Security Lab
 
-Portfolio and writing site for case studies, shipped work, and technical
-reflections, built with Astro 6, Tailwind CSS 4, and MDX.
+Security blog and challenge lab for exploit development walkthroughs, CTF
+write-ups, detection engineering notes, and interactive labs, built with
+Astro 6, Tailwind CSS 4, and MDX.
 
-This repository powers a custom monochrome portfolio experience with an
-immersive landing page, a case-study-driven about page, and a writing archive
-for project notes, hackathon writeups, and implementation retrospectives. The
-current site is a substantial theme, content, and information-architecture
-rewrite of `astro-erudite`.
+This repository powers a monochrome security-lab experience with an immersive
+landing page, a case-study about page, and a writing archive for write-ups,
+labs, and implementation retrospectives. The site is a substantial theme,
+content, and information-architecture rewrite of `astro-erudite`.
 
 ![Homepage preview](./public/static/readme-home.png)
 
@@ -18,9 +18,8 @@ rewrite of `astro-erudite`.
 
 ## Highlights
 
-- Portfolio-first experience with an immersive monochrome landing page,
-  case-study about page, writing archive, project listings, author pages, and
-  tag pages
+- Security-lab experience with an immersive monochrome landing page,
+  about page, writing archive, author pages, and tag pages
 - MDX-powered publishing workflow for blog posts, project entries, and author
   profiles
 - SEO-friendly setup with canonical URLs, sitemap generation, RSS output, Open
@@ -144,8 +143,8 @@ Example blog post frontmatter:
 title: 'Post title'
 description: 'Short summary'
 date: 2026-04-03
-tags: ['astro', 'portfolio']
-authors: ['chai-pin-zheng']
+tags: ['astro', 'security']
+authors: ['yxng-ecstasy']
 draft: false
 ---
 ```
@@ -159,12 +158,11 @@ Example author profile frontmatter:
 
 ```yml
 ---
-name: 'Chai Pin Zheng'
+name: 'YxngEcstasy'
 avatar: '/static/logo.png'
-bio: 'Project retrospectives, technical writing, and product engineering notes.'
-github: 'https://github.com/Ducksss'
-linkedin: 'https://www.linkedin.com/in/chai-pin-zheng/'
-mail: 'chaipinzheng@gmail.com'
+bio: 'Security researcher documenting the full kill chain — recon, exploitation, privilege escalation, and the detections that catch it.'
+github: 'https://github.com/your-handle'
+mail: 'contact@yourdomain.com'
 ---
 ```
 
@@ -190,8 +188,8 @@ Before deploying:
 
 This site started from [astro-erudite](https://github.com/jktrn/astro-erudite)
 by [jktrn](https://github.com/jktrn). The current repository is an extensive
-theme, content, and information-architecture rewrite tailored to Chai Pin
-Zheng's portfolio and writing archive.
+theme, content, and information-architecture rewrite for the YxngEcstasy
+security lab and writing archive.
 
 ## License
 

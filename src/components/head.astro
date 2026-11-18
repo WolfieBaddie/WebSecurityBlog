@@ -49,5 +49,14 @@ const shouldLoadAnalytics = import.meta.env.VERCEL_ENV === 'production'
   <ClientRouter />
   {shouldLoadAnalytics && <Analytics />}
 
+  <!-- Google tag (gtag.js) — GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3Z504T0H2P"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3Z504T0H2P');
+  </script>
+
   <slot />
 </head>

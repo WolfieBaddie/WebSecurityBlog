@@ -6,7 +6,7 @@ import { basename, extname, resolve } from 'node:path'
 
 const cwd = process.cwd()
 const options = parseArgs(process.argv.slice(2))
-const owner = options.owner ?? 'Chai Pin Zheng'
+const owner = options.owner ?? 'Yxng Ecstasy'
 const ownerSlug = slugify(owner)
 const inferredAliases = loadOwnerAliases(ownerSlug)
 const allowedValues = Array.from(

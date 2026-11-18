@@ -69,10 +69,32 @@ if (staticPost) {
   authors = await parseAuthors(staticPost.data.authors ?? [])
   postMeta = staticPost.data
 } else {
-  // 2. Fallback: Query PostgreSQL for published post
-  const foundDbPost = await db.query.posts.findFirst({
-    where: and(eq(posts.slug, currentPostId), eq(posts.status, 'published')),
-  })
+  // 2. Fallback: Query PostgreSQL for published post.
+  // Slugs removed during the YxngEcstasy rebrand shouldn't strand old bookmarks.
+  const retiredSlugs = new Set([
+    'mobile-nav-and-subposts',
+    'rehype-patch',
+    'callouts-component',
+    'the-state-of-static-blogs',
+    'how-i-write-product-and-engineering-case-studies',
+    'how-this-astro-portfolio-is-structured',
+  ])
+
+  if (retiredSlugs.has(currentPostId)) {
+    return Astro.redirect('/blog', 301)
+  }
+
+  // Unknown slugs (or a DB outage) must render the 404 page, not throw a 500.
+  let foundDbPost: typeof posts.$inferSelect | null = null
+
+  try {
+    foundDbPost =
+      (await db.query.posts.findFirst({
+        where: and(eq(posts.slug, currentPostId), eq(posts.status, 'published')),
+      })) ?? null
+  } catch {
+    foundDbPost = null
+  }
 
   if (!foundDbPost) {
     return Astro.redirect('/404')

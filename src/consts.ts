@@ -2,6 +2,7 @@ import type {
   FooterContent,
   IconMap,
   LandingContent,
+  LandingLink,
   Profile,
   SocialLink,
   Site,
@@ -19,11 +20,11 @@ const SITE_URL = resolveSiteUrl({
 // ─────────────────────────────────────────────────────────────
 
 export const SITE: Site = {
-  title: 'YXN // Security Lab',
+  title: 'YxngEcstasy // Security Lab',
   description:
     'Hands-on cybersecurity: exploit development walkthroughs, CTF write-ups, detection engineering notes, and interactive lab challenges.',
   href: SITE_URL,
-  author: 'YXN',
+  author: 'YxngEcstasy',
   locale: 'en-US',
   featuredPostCount: 3,
   postsPerPage: 3,
@@ -48,11 +49,12 @@ export const PROFILE: Profile = {
     'This site is the working notebook — CTF solutions, exploit development walkthroughs, reverse engineering notes, and challenge labs built for practitioners who want reproducible proof, not theory.',
   ],
   links: [
-    {
-      href: 'https://github.com/Ducksss',
-      label: 'GitHub',
-      note: 'Exploits, tooling, and lab repositories.',
-    },
+    // TODO: add your real GitHub / LinkedIn / X profiles here
+    // {
+    //   href: 'https://github.com/your-handle',
+    //   label: 'GitHub',
+    //   note: 'Exploits, tooling, and lab repositories.',
+    // },
     // TODO: replace with your real contact address
     {
       href: 'mailto:contact@yourdomain.com',
@@ -200,8 +202,8 @@ export const PROFILE: Profile = {
 }
 
 export const LANDING: LandingContent = {
-  name: 'YXN',
-  monogram: 'YXN',
+  name: 'YxngEcstasy',
+  monogram: 'YX',
   eyebrow: 'Exploit development // CTF write-ups // detection engineering',
   description:
     'Security write-ups and lab challenges documenting the full path: recon, exploitation, escalation, and the detections that catch it.',
@@ -214,8 +216,7 @@ export const LANDING: LandingContent = {
   archiveIntro:
     'Every solution keeps its proof trail visible: the recon, the payload, the crash, the shell, and the fix.',
   primaryLink: {
-    href: 'mailto:contact@yourdomain.com',
-    label: 'Responsible disclosure',
+    href: 'mailto:contact@yourdomain.com',    label: 'Responsible disclosure',
     note: 'Found something? Coordinated disclosure welcome.',
   },
   secondaryLink: {
@@ -253,6 +254,24 @@ const githubLink = PROFILE.links.find((item) => item.label === 'GitHub')
 const emailAddress =
   emailLink?.href.replace(/^mailto:/, '') ?? 'contact@yourdomain.com'
 
+const contactLinks: LandingLink[] = [
+  {
+    href: emailLink?.href ?? 'mailto:contact@yourdomain.com',
+    label: 'Email',
+  },
+]
+
+if (githubLink) {
+  contactLinks.push({ href: githubLink.href, label: 'GitHub' })
+}
+
+contactLinks.push(
+  { href: '/rss.xml', label: 'RSS' },
+  { href: '/about', label: 'About' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+)
+
 export const FOOTER: FooterContent = {
   eyebrow: 'Contact // Responsible disclosure',
   headline:
@@ -265,32 +284,7 @@ export const FOOTER: FooterContent = {
   baseLabel: 'Base',
   baseValue: 'Isolated labs // Kali Linux',
   linksLabel: 'Links',
-  contactLinks: [
-    {
-      href: emailLink?.href ?? 'mailto:contact@yourdomain.com',
-      label: 'Email',
-    },
-    {
-      href: githubLink?.href ?? 'https://github.com/Ducksss',
-      label: 'GitHub',
-    },
-    {
-      href: '/rss.xml',
-      label: 'RSS',
-    },
-    {
-      href: '/about',
-      label: 'About',
-    },
-    {
-      href: '/privacy',
-      label: 'Privacy',
-    },
-    {
-      href: '/terms',
-      label: 'Terms',
-    },
-  ],
+  contactLinks,
   signature: `${LANDING.name} / ${currentYear}`,
 }
 

@@ -30,15 +30,14 @@ const sections = [
 
 const emailLink =
   PROFILE.links.find((item) => item.label === 'Email')?.href ?? 'mailto:contact@yourdomain.com'
-const githubLink =
-  PROFILE.links.find((item) => item.label === 'GitHub')?.href ?? 'https://github.com/Ducksss'
+const githubLink = PROFILE.links.find((item) => item.label === 'GitHub')?.href
 ---
 
 <Layout variant="immersive">
   <PageHead
     slot="head"
     title="About"
-    description="About the operator and editorial standards behind YXN // Security Lab."
+    description="About the operator and editorial standards behind YxngEcstasy // Security Lab."
   />
 
   <section class="relative overflow-hidden border-b border-white/10 bg-black/30">
@@ -70,9 +69,13 @@ const githubLink =
             <Link href={emailLink} external class="landing-button landing-button--ghost group">
               <span>Responsible disclosure</span>
             </Link>
-            <Link href={githubLink} external class="landing-button landing-button--ghost group">
-              <span>GitHub</span>
-            </Link>
+            {
+              githubLink && (
+                <Link href={githubLink} external class="landing-button landing-button--ghost group">
+                  <span>GitHub</span>
+                </Link>
+              )
+            }
           </div>
         </div>
 

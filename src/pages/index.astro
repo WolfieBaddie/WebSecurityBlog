@@ -1,38 +1,27 @@
 ---
 import ArchiveProof from '@/components/landing/archive-proof.astro'
 import LandingAsciiField from '@/components/landing/ascii-field.astro'
-import FeaturedWork from '@/components/landing/featured-work.astro'
 import LiveArchive from '@/components/landing/live-archive.astro'
 import SignalMarquee from '@/components/landing/signal-marquee.astro'
 import Link from '@/components/link.astro'
 import PageHead from '@/components/page-head.astro'
-import { LANDING, PROFILE, SITE } from '@/consts'
+import { LANDING, SITE } from '@/consts'
 import Layout from '@/layouts/layout.astro'
-import {
-  getArchiveStats,
-  getFeaturedProjects,
-  getRecentPosts,
-} from '@/lib/data-utils'
+import { getArchiveStats, getRecentPosts } from '@/lib/data-utils'
 
 const archivePosts = await getRecentPosts(
   Math.max(SITE.featuredPostCount + 1, 4),
 )
-// const featuredProjects = await getFeaturedProjects(3)
 const archiveStats = await getArchiveStats()
 const [featuredPost, ...supportingPosts] = archivePosts
-const [nameLineOne = 'YXN', nameLineTwo = 'Ecstasy'] =
-  LANDING.name.split(' ')
 const heroPills = [
-  'NUS CS / First Class track',
-  '70% training-efficiency lift',
-  '2.5k -> 6k weekly reach',
+  'pwn / web / crypto',
+  'Reproducible labs',
+  'Attack + detection paired',
 ]
-// const linkedInLink =
-//   PROFILE.links.find((item) => item.label === 'LinkedIn')?.href ??
-//   'https://www.linkedin.com/in/chai-pin-zheng/'
 const consoleNotes = [
-  'Best fit: technically strong products that still feel too hard to enter, operate, or hand off.',
-  'Recent proof: MetaLearner onboarding, GovTech platform tooling, and SAF readiness systems.',
+  'Best fit: hands-on labs where the exploit and the detection are documented side by side.',
+  'Recent proof: CTF write-ups, exploit demos, and detection engineering notes.',
 ]
 ---
 
@@ -70,8 +59,7 @@ const consoleNotes = [
             <h1
               class="landing-wordmark mt-4 text-[clamp(3.3rem,18vw,7rem)] leading-[0.84] font-semibold tracking-[-0.09em] text-white uppercase sm:mt-6 lg:text-[clamp(4rem,14vw,12rem)]"
             >
-              <span class="inline-block">{nameLineOne}</span>
-              <span class="ml-4 inline-block text-white/40">{nameLineTwo}</span>
+              <span class="inline-block">{LANDING.name}</span>
             </h1>
           <p
             class="landing-manifesto mt-6 max-w-xl text-[0.98rem] leading-7 text-balance text-white/70 sm:mt-8 sm:max-w-2xl sm:text-lg sm:leading-8"
@@ -120,8 +108,7 @@ const consoleNotes = [
             <span class="text-white/38">Proof path</span>
             <span class="hidden text-white/22 sm:inline">/</span>
             <span class="text-sm text-white/48">
-              Start with the outcomes here, then open the case studies and build
-              logs.
+              Start with the write-ups, then open the labs and payloads.
             </span>
           </div>
         </div>
@@ -167,30 +154,6 @@ const consoleNotes = [
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="border-y border-white/10 bg-[#020202]">
-    <div
-      class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12"
-    >
-      <div
-        class="flex flex-col gap-4 border-b border-white/10 pb-6 sm:gap-5 sm:pb-8 lg:flex-row lg:items-end lg:justify-between"
-      >
-        <div class="max-w-2xl">
-          <p class="landing-section-label">Selected proof</p>
-          <h2 class="landing-section-title mt-4 max-w-xl">
-            Attributed outcomes that make the homepage pitch checkable.
-          </h2>
-        </div>
-        <p
-          class="max-w-xl text-sm leading-6 text-white/56 sm:text-base sm:leading-7"
-        >
-          Start with the outcomes. The case studies below explain how those
-          gains were made and where the work fits best.
-        </p>
-      </div>
-
     </div>
   </section>
 

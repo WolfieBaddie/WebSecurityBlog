@@ -52,7 +52,7 @@
     font-family="Helvetica Neue, Arial, sans-serif"
     letter-spacing="-2.5"
   >
-    Chai Pin
+    Yxng
   </text>
   <text
     x="86"
@@ -63,7 +63,7 @@
     font-family="Helvetica Neue, Arial, sans-serif"
     letter-spacing="-2.5"
   >
-    Zheng
+    Ecstasy
   </text>
   <text
     x="86"
@@ -73,7 +73,7 @@
     font-weight="500"
     font-family="Helvetica Neue, Arial, sans-serif"
   >
-    Product engineering, developer tooling,
+    Exploit development, CTF write-ups,
   </text>
   <text
     x="86"
@@ -83,7 +83,7 @@
     font-weight="500"
     font-family="Helvetica Neue, Arial, sans-serif"
   >
-    and operational systems.
+    and detection engineering.
   </text>
 
   <text
@@ -95,7 +95,7 @@
     font-family="Helvetica Neue, Arial, sans-serif"
     letter-spacing="3"
   >
-    PORTFOLIO / WRITING / PROJECTS
+    SECURITY / LABS / WRITE-UPS
   </text>
   <text
     x="86"
@@ -105,7 +105,7 @@
     font-weight="500"
     font-family="Helvetica Neue, Arial, sans-serif"
   >
-    Singapore-based software engineer and
+    Security researcher documenting the
   </text>
   <text
     x="86"
@@ -115,7 +115,7 @@
     font-weight="500"
     font-family="Helvetica Neue, Arial, sans-serif"
   >
-    NUS Computer Science student.
+    full kill chain in the lab.
   </text>
 
   <text
@@ -127,7 +127,7 @@
     font-family="Helvetica Neue, Arial, sans-serif"
     letter-spacing="2"
   >
-    ducksss.github.io/Chai-Pin-Zheng
+    yxngecstasy.xyz
   </text>
 
   <g opacity="0.88">
